@@ -1,6 +1,7 @@
+
 import { supabase } from './supabaseClient.js'
 
-// Recupera o usuário logado. Redireciona para login se não estiver autenticado.
+// Recupera o usuÃ¡rio logado. Redireciona para login se nÃ£o estiver autenticado.
 async function getUser() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) window.location.href = 'login.html'
@@ -28,15 +29,15 @@ async function carregarLista() {
   })
 }
 
-// Adiciona novo item à lista de compras
+// Adiciona novo item Ã  lista de compras
 window.adicionarItem = async function () {
   const user = await getUser()
-  console.log('Usuário:', user)
+  console.log('UsuÃ¡rio:', user)
   console.log('Item:', input.value)
 
   const { error } = await supabase.from('lista_compras').insert({
     item: input.value,
-    adicionado_por: user.id // Certifique-se que a coluna existe e é do tipo uuid
+    adicionado_por: user.id // Certifique-se que a coluna existe e Ã© do tipo uuid
   })
 
   if (error) return alert('Erro ao adicionar: ' + error.message)
@@ -52,13 +53,13 @@ window.removerItem = async function (id) {
   carregarLista()
 }
 
-// Realiza logout do usuário
+// Realiza logout do usuÃ¡rio
 window.logout = async function () {
   await supabase.auth.signOut()
   window.location.href = 'login.html'
 }
 
-// Inicializa: verifica se o usuário está logado e carrega a lista
+// Inicializa: verifica se o usuÃ¡rio estÃ¡ logado e carrega a lista
 getUser().then(carregarLista)
 
 // enter funciona para adicionar item
@@ -67,12 +68,4 @@ document.addEventListener('keydown', function (event) {
       adicionarItem()
  }
 })
-// Importa a função de criação do client Supabase via CDN
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-// Cria o client com a URL e a chave fornecidas
-export const supabase = createClient(
-  'SUPABASE_URL',
-  'SUPABASE_ANON_KEY'
-)
     
