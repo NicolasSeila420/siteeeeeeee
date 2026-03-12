@@ -27,4 +27,8 @@ body{
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    
+}
+.rounded-image {
+  border-radius: 25px; /* Adjust the value for more or less rounding */
 }
