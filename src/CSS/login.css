@@ -75,8 +75,8 @@ button {
     font-weight: 500;
     border: none;
     border-radius: var(--ratio);
-    background-color: var(--cor-primaria-5);
-    color: var(--cor-primaria-1);
+    background-color: var(--cor-primaria-1);
+    color: var(--cor-primaria-4);
     cursor: pointer;
     transition: var(--transition);
 }
