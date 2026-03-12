@@ -6,6 +6,14 @@
     --cor-primaria-4: #DECBB7;
     --cor-primaria-5: #F7F0F5;
     
+
     --fonte: "Fjalla One", sans-serif;
 
+    --ratio: 12px;
+    --transition: 0.3s ease;
+}
+  * {   
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
 }
