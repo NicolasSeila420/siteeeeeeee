@@ -29,4 +29,14 @@ body{
     padding: 20px;
     
 }
+.container {
+    background: var(--cor-primaria-5);
+    padding: clamp(2rem, 5vm, 3rem);
+    border-radius: var(--cor-primaria-4);
+    box-shadow: 0 8px 24px var(--cor-primaria-2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    
+}
 
