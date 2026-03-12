@@ -61,3 +61,26 @@ input.focus {
     outline: none;
     box-shadow: var(--cor-primaria-2);
 }
+
+.botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--ratio);
+    background-color: var(--cor-primaria-5);
+    color: var(--cor-primaria-1);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+button.hover {
+    background-color: var(--cor-primaria-2);
+}
