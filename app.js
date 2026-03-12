@@ -72,7 +72,7 @@ document.addEventListener('keydown', function (event) {
 document.querySelector("#files").addEventListener("change",(e) => {
   if(window.File && window.FileReader && window.FileList && window.Blob){
     const files = e.target.files;
-    const output = document.querySelector('#result');
+    const output = document.querySelector("#result");
 
     for(let i = 0;i < files.length;i++){
       if(!files[i].type.match("image")) continue;

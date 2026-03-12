@@ -39,7 +39,7 @@ body{
     text-align: center;
 }
 #result{
-   display: flex;
+   display:list-item;
    gap: 10px;
    padding: 10px 0;
     }
