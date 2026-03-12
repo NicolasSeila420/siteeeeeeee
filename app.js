@@ -68,4 +68,13 @@ document.addEventListener('keydown', function (event) {
       adicionarItem()
  }
 })
+
+document.querySelector("#files").addEventListener("change",(e) => {
+  if(window.File && window.FileReader && window.FileList && window.Blob){
+    const files = e.target.files;
+    console.log(files);
+  } else {
+    alert("Your browser is Shit")
+  }
+})
     
