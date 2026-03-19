@@ -39,6 +39,13 @@ body{
     
 }
 
+#logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: var(--ratio);
+}
+
 .titulo{
     font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
     color: var(--cor-primaria-1);
