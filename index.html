@@ -18,7 +18,7 @@
     </div>
  
 
-<div class="blackman"><img src="blackman.png" alt="A Black Man Screaming" width="200" height="200"></div>
+<div id="multiplierImg"><img src="blackman.png" alt="A Black Man Screaming" width="200" height="200"></div>
 
  <img src="pvz.jpg" id="flying-finaland" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px;" onclick="window.location.href='login.html'">
 
@@ -49,6 +49,24 @@
 
       
   
+    </script>
+
+       <div id="container" class="container">
+        <div class="box">Original</div>
+    </div>
+
+    <script>
+        document.getElementById('multiplierImg').addEventListener('click', function() {
+            // 1. Create a new div element
+            var newDiv = document.createElement('div');
+            
+            // 2. Add content or styling to the new element
+            newDiv.className = 'box';
+            newDiv.innerHTML = 'New Box';
+            
+            // 3. Append the new element to the container
+            document.getElementById('container').appendChild(newDiv);
+        });
     </script>
     
 
