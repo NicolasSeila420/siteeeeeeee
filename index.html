@@ -19,6 +19,37 @@
  
 
 <div class="blackman"><img src="blackman.png" alt="A Black Man Screaming" width="200" height="200"></div>
+
+ <img src="pvz.jpg" id="flying-finaland" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px;" onclick="window.location.href='login.html'">
+
+    <script>
+      const flyingFinaland = document.getElementById("flying-finaland");
+      let xDirection = 1;
+      let yDirection = 1;
+      let xPosition = 0;
+      let yPosition = 0;
+      let speed = 5;
+
+      function moveFinaland() {
+        xPosition += speed * xDirection;
+        yPosition += speed * yDirection;
+
+        if (xPosition >= window.innerWidth - flyingFinaland.width || xPosition <= 0) {
+          xDirection *= -1;
+        }
+        if (yPosition >= window.innerHeight - flyingFinaland.height || yPosition <= 0) {
+          yDirection *= -1;
+        }
+
+        flyingFinaland.style.left = xPosition + "px";
+        flyingFinaland.style.top = yPosition + "px";
+      }
+
+      setInterval(moveFinaland, 50);
+
+      
+  
+    </script>
     
 
     
