@@ -40,7 +40,7 @@ body{
 }
 
 #logo {
-    width: 2000000px;
+    width: 300px;
     height: auto;
     margin-bottom: 20px;
     border-radius: var(--ratio);
