@@ -38,6 +38,14 @@ body{
     max-width: 400px;
     text-align: center;
 }
+
+#logo {
+    width: 300px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: var(--ratio);
+}
+
 #result{
    display:list-item;
    gap: 10px;
