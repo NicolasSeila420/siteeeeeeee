@@ -76,7 +76,21 @@ input.focus {
     margin-top: 20px;
 }
 
+button {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--ratio);
+    background-color: var(--cor-primaria-3);
+    color: var(--cor-primaria-1);
+    cursor: pointer;
+    transition: var(--transition);
+}
 
+button.hover {
+    background-color: var(--cor-primaria-2);
+}
 
 @media (max-width:360px) {
     .container {
