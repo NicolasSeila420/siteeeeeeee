@@ -69,7 +69,7 @@ input.focus {
     box-shadow: var(--cor-primaria-2);
 }
 
-.botoes {
+button {
     display: flex;
     flex-direction: column;
     gap: 12px;
