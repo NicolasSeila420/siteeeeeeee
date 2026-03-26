@@ -54,3 +54,21 @@ body{
 .thumbnail{
     height: 192px;
      }
+
+button[onclick="logout()"] {
+    align-self: flex-end;
+    margin-bottom: 1.5rem;
+    background-color: var(--cor-primaria-2);
+    color: var(--cor-primaria-5);
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--ratio);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+button[onclick="logout()"] :hover{
+    background-color: var(--cor-primaria-1);
+
+}
