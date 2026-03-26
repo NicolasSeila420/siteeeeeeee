@@ -120,7 +120,7 @@ button[onclick="logout()"]:hover {
      box-shadow: 0 2px 6px var(--cor-primaria-3);
 }
 
-button[onclick="adicionarItem"] {
+button[onclick="adicionarItem()"] {
     align-self: flex-end;
     margin-bottom: 1.5rem;
     padding: 12px 20px;
