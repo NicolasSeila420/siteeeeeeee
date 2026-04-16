@@ -91,14 +91,14 @@
             let speed = 9;
             let easterEggAtivo = false;
             let easterEggTimeout = null;
+            let jumpscareTimeout = null;
 
-            let listaItens = [];
-            let modoOffline = false;
-
-            flyingFinaland.style.opacity = '0.15';
+            flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
 
             function moveFinaland() {
+                if (!easterEggAtivo) return;
+                
                 xPosition += speed * xDirection;
                 yPosition += speed * yDirection;
 
@@ -114,6 +114,27 @@
             }
 
             setInterval(moveFinaland, 50);
+
+            function shakeScreen() {
+                const container = document.querySelector('.app-container');
+                container.style.transition = 'transform 0.05s';
+                
+                let shakes = 0;
+                const maxShakes = 10;
+                
+                const shakeInterval = setInterval(() => {
+                    const x = (Math.random() - 0.5) * 10;
+                    const y = (Math.random() - 0.5) * 10;
+                    container.style.transform = `translate(${x}px, ${y}px)`;
+                    
+                    shakes++;
+                    if (shakes >= maxShakes) {
+                        clearInterval(shakeInterval);
+                        container.style.transform = 'translate(0, 0)';
+                        container.style.transition = 'transform 0.3s';
+                    }
+                }, 50);
+            }
 
             function atualizarEstadoVazio() {
                 if (listaItens.length === 0) {
@@ -305,22 +326,40 @@
                     opacity: 0;
                     pointer-events: none;
                     z-index: 9998;
-                    transition: opacity 2s ease;
+                    transition: opacity 2s ease, transform 0.3s ease;
                 `;
                 document.body.appendChild(bgDiv);
                 
-                setTimeout(() => bgDiv.style.opacity = '0.1', 50);
+                setTimeout(() => {
+                    bgDiv.style.opacity = '0.1';
+                    flyingFinaland.style.opacity = '1';
+                }, 50);
+                
+                if (jumpscareTimeout) clearTimeout(jumpscareTimeout);
+                
+                jumpscareTimeout = setTimeout(() => {
+                    bgDiv.style.transition = 'opacity 0.1s, transform 0.2s';
+                    bgDiv.style.opacity = '1';
+                    bgDiv.style.transform = 'scale(1.3)';
+                    
+                    shakeScreen();
+                    
+                    setTimeout(() => {
+                        bgDiv.style.transition = 'opacity 1s, transform 0.3s';
+                        bgDiv.style.opacity = '0.1';
+                        bgDiv.style.transform = 'scale(1)';
+                    }, 300);
+                }, 3000);
                 
                 const velocidadeOriginal = speed;
-                speed = 18;
-                flyingFinaland.style.opacity = '1';
+                    speed = 18;
                 
                 if (easterEggTimeout) clearTimeout(easterEggTimeout);
                 
                 easterEggTimeout = setTimeout(() => {
                     bgDiv.style.opacity = '0';
                     speed = velocidadeOriginal;
-                    flyingFinaland.style.opacity = '0.15';
+                    flyingFinaland.style.opacity = '0';
                     
                     setTimeout(() => {
                         bgDiv.remove();
@@ -329,10 +368,12 @@
                 }, 15000);
             }
 
+            let listaItens = [];
+            let modoOffline = false;
             carregarLista();
         });
     </script>
     
     <script type="module" src="app.js"></script>
 </body>
-    </html>
+</html>
