@@ -432,4 +432,41 @@ body {
     .item-acoes {
         justify-content: flex-end;
     }
+    .aviso-visual {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    background-color: rgba(192, 57, 43, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: var(--cor-erro);
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 3px solid var(--cor-erro);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    pointer-events: none;
+    max-width: calc(100% - 32px);
+}
+
+.aviso-visual i {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .aviso-visual {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        justify-content: center;
+    }
+}
 }
