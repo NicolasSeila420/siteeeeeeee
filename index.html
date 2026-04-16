@@ -189,14 +189,16 @@
             function salvarLista() {
                 localStorage.setItem('listaCompras', JSON.stringify(listaItens));
                 avisoVisual.style.opacity = '1';
-                avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.15)';
-                avisoVisual.style.borderLeftColor = '#27ae60';
+                avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)';
+                avisoVisual.style.borderLeftColor = '#ffffff';
+                avisoVisual.style.color = '#ffffff';
                 avisoVisual.querySelector('span').textContent = 'Lista salva com sucesso!';
                 
                 setTimeout(() => {
                     avisoVisual.style.opacity = '0.6';
-                    avisoVisual.style.backgroundColor = 'rgba(192, 57, 43, 0.1)';
-                    avisoVisual.style.borderLeftColor = '#c0392b';
+                    avisoVisual.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                    avisoVisual.style.borderLeftColor = '#ffffff';
+                    avisoVisual.style.color = '#ffffff';
                     avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos. Continue digitando.';
                 }, 2000);
             }
