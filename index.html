@@ -35,9 +35,9 @@
             </div>
 
             <div id="listaContainer" class="lista-container">
-                <ul id="lista" class="lista-itens"></ul>
+                <ul id="lista" class="lista-itens" style="display: none;"></ul>
                 
-                <div id="estadoVazio" class="estado-vazio">
+                <div id="estadoVazio" class="estado-vazio" style="display: flex;">
                     <i class="fas fa-shopping-basket"></i>
                     <p>Sua lista está vazia</p>
                     <span>Adicione itens para começar</span>
@@ -92,6 +92,8 @@
             let easterEggAtivo = false;
             let easterEggTimeout = null;
             let jumpscareTimeout = null;
+            let listaItens = [];
+            let modoOffline = false;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -157,7 +159,11 @@
             function carregarLista() {
                 const saved = localStorage.getItem('listaCompras');
                 if (saved) {
-                    listaItens = JSON.parse(saved);
+                    try {
+                        listaItens = JSON.parse(saved);
+                    } catch (e) {
+                        listaItens = [];
+                    }
                 } else {
                     listaItens = [];
                 }
@@ -166,6 +172,11 @@
 
             function renderizarLista() {
                 listaElement.innerHTML = '';
+                
+                if (listaItens.length === 0) {
+                    atualizarEstadoVazio();
+                    return;
+                }
                 
                 listaItens.forEach((item, index) => {
                     const li = document.createElement('li');
@@ -196,16 +207,18 @@
                 document.querySelectorAll('.item-checkbox').forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
                         const index = parseInt(this.dataset.index);
-                        listaItens[index].comprado = this.checked;
-                        salvarLista();
-                        renderizarLista();
+                        if (listaItens[index]) {
+                            listaItens[index].comprado = this.checked;
+                            salvarLista();
+                            renderizarLista();
+                        }
                     });
                 });
                 
                 document.querySelectorAll('.btn-diminuir').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const index = parseInt(this.dataset.index);
-                        if (listaItens[index].quantidade > 1) {
+                        if (listaItens[index] && listaItens[index].quantidade > 1) {
                             listaItens[index].quantidade--;
                             salvarLista();
                             renderizarLista();
@@ -216,18 +229,22 @@
                 document.querySelectorAll('.btn-aumentar').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const index = parseInt(this.dataset.index);
-                        listaItens[index].quantidade = (listaItens[index].quantidade || 1) + 1;
-                        salvarLista();
-                        renderizarLista();
+                        if (listaItens[index]) {
+                            listaItens[index].quantidade = (listaItens[index].quantidade || 1) + 1;
+                            salvarLista();
+                            renderizarLista();
+                        }
                     });
                 });
                 
                 document.querySelectorAll('.btn-remover').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const index = parseInt(this.dataset.index);
-                        listaItens.splice(index, 1);
-                        salvarLista();
-                        renderizarLista();
+                        if (listaItens[index]) {
+                            listaItens.splice(index, 1);
+                            salvarLista();
+                            renderizarLista();
+                        }
                     });
                 });
                 
@@ -352,7 +369,7 @@
                 }, 3000);
                 
                 const velocidadeOriginal = speed;
-                    speed = 18;
+                speed = 18;
                 
                 if (easterEggTimeout) clearTimeout(easterEggTimeout);
                 
@@ -368,9 +385,7 @@
                 }, 15000);
             }
 
-            let listaItens = [];
-            let modoOffline = false;
-            carregarLista();
+                carregarLista();
         });
     </script>
     
