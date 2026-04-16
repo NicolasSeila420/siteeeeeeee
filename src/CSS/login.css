@@ -9,6 +9,14 @@
     --cor-erro: #c0392b;
     --cor-sucesso: #27ae60;
     --cor-info: #2980b9;
+    --bg-gradient: linear-gradient(135deg, #8F857D 0%, #DECBB7 50%, #F7F0F5 100%);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --input-bg: rgba(255, 255, 255, 0.7);
+    --input-focus-bg: #ffffff;
+    --shadow-color: rgba(67, 54, 51, 0.25);
+    --border-color: rgba(255, 255, 255, 0.5);
+    --label-bg: var(--cor-primaria-5);
+    --autofill-bg: var(--cor-primaria-5);
 
     --fonte: "Architects Daughter", cursive;
     --fonte-secundaria: 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -19,6 +27,25 @@
     --transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
 
+[data-theme="dark"] {
+    --cor-primaria-1: #DECBB7;
+    --cor-primaria-2: #8F857D;
+    --cor-primaria-3: #5C5552;
+    --cor-primaria-4: #433633;
+    --cor-primaria-5: #2a2524;
+    --cor-erro: #e74c3c;
+    --cor-sucesso: #2ecc71;
+    --cor-info: #3498db;
+    --bg-gradient: linear-gradient(135deg, #1a1514 0%, #2a2524 50%, #3a3432 100%);
+    --card-bg: rgba(42, 37, 36, 0.85);
+    --input-bg: rgba(58, 52, 50, 0.7);
+    --input-focus-bg: #3a3432;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --border-color: rgba(222, 203, 183, 0.1);
+    --label-bg: var(--cor-primaria-5);
+    --autofill-bg: var(--cor-primaria-5);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -27,7 +54,7 @@
 
 body {
     font-family: var(--fonte-secundaria);
-    background: linear-gradient(135deg, #8F857D 0%, #DECBB7 50%, #F7F0F5 100%);
+    background: var(--bg-gradient);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -36,21 +63,21 @@ body {
     margin: 0;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.3s ease;
 }
 
 .login-card {
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--card-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    background-color: var(--cor-primaria-5);
     padding: 2.5rem 2rem;
     border-radius: var(--border-radius-card);
-    box-shadow: 0 20px 40px -8px rgba(67, 54, 51, 0.25), 
+    box-shadow: 0 20px 40px -8px var(--shadow-color), 
                 0 8px 16px -6px rgba(0, 0, 0, 0.05);
     width: 100%;
     max-width: 420px;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-color);
     transition: var(--transition);
 }
 
@@ -117,7 +144,7 @@ form {
     border-radius: var(--border-radius-input);
     font-size: 1rem;
     font-family: var(--fonte-secundaria);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--input-bg);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     transition: var(--transition);
@@ -141,8 +168,8 @@ form {
 
 .input-group input:focus {
     border-color: var(--cor-primaria-2);
-    background-color: #ffffff;
-    box-shadow: 0 4px 8px -2px rgba(67, 54, 51, 0.1);
+    background-color: var(--input-focus-bg);
+    box-shadow: 0 4px 8px -2px var(--shadow-color);
 }
 
 .input-group input:focus + label,
@@ -150,7 +177,7 @@ form {
     top: 0;
     left: 40px;
     font-size: 0.75rem;
-    background-color: var(--cor-primaria-5);
+    background-color: var(--label-bg);
     padding: 0 8px;
     color: var(--cor-primaria-2);
     font-weight: 500;
@@ -186,7 +213,7 @@ form {
 }
 
 .toggle-password:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
     color: var(--cor-primaria-1);
 }
 
@@ -241,27 +268,27 @@ form {
     border: none;
     border-radius: var(--border-radius-input);
     background-color: var(--cor-primaria-1);
-    color: white;
+    color: var(--cor-primaria-5);
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 6px 12px -4px rgba(67, 54, 51, 0.3);
+    box-shadow: 0 6px 12px -4px var(--shadow-color);
     position: relative;
     overflow: hidden;
 }
 
 .btn-primario:hover {
-    background-color: #2c2422;
+    background-color: var(--cor-primaria-2);
     transform: translateY(-2px);
-    box-shadow: 0 12px 20px -8px rgba(67, 54, 51, 0.4);
+    box-shadow: 0 12px 20px -8px var(--shadow-color);
 }
 
 .btn-primario:active {
     transform: translateY(1px);
-    box-shadow: 0 4px 8px -2px rgba(67, 54, 51, 0.3);
+    box-shadow: 0 4px 8px -2px var(--shadow-color);
 }
 
 .btn-primario:disabled {
@@ -276,7 +303,7 @@ form {
     height: 20px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    border-top-color: #ffffff;
+    border-top-color: var(--cor-primaria-5);
     animation: spin 0.8s linear infinite;
     display: inline-block;
 }
@@ -306,9 +333,51 @@ form {
 }
 
 .link-btn:hover {
-    background-color: rgba(92, 85, 82, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     color: var(--cor-primaria-1);
     text-decoration-color: var(--cor-primaria-3);
+}
+
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    z-index: 1000;
+    color: var(--cor-primaria-1);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.theme-toggle .fa-sun {
+    display: none;
+}
+
+.theme-toggle .fa-moon {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .fa-sun {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .fa-moon {
+    display: none;
 }
 
 @media (max-width: 480px) {
@@ -329,12 +398,19 @@ form {
     #logo {
         max-width: 120px;
     }
+    
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+    }
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--cor-primaria-5) inset !important;
+    -webkit-box-shadow: 0 0 0 30px var(--autofill-bg) inset !important;
     -webkit-text-fill-color: var(--cor-primaria-1) !important;
 }
