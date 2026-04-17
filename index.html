@@ -72,6 +72,13 @@
         <i class="fas fa-sun"></i>
     </button>
 
+    <div id="modalImagem" class="modal-imagem" style="display: none;">
+        <span class="modal-fechar">&times;</span>
+        <img id="modalImagemConteudo" class="modal-conteudo">
+    </div>
+
+    <input type="file" id="uploadImagemInput" accept="image/*" style="display: none;">
+
     <img src="pvz.jpg" id="flying-finaland" alt="">
 
     <script>
@@ -112,6 +119,10 @@
             const statusConexao = document.getElementById('statusConexao');
             const loadingOverlay = document.getElementById('loadingOverlay');
             const avisoVisual = document.getElementById('avisoVisual');
+            const uploadImagemInput = document.getElementById('uploadImagemInput');
+            const modalImagem = document.getElementById('modalImagem');
+            const modalImagemConteudo = document.getElementById('modalImagemConteudo');
+            const modalFechar = document.querySelector('.modal-fechar');
             
             const flyingFinaland = document.getElementById('flying-finaland');
             let xDirection = 1;
@@ -124,6 +135,7 @@
             let jumpscareTimeout = null;
             let listaItens = [];
             let modoOffline = false;
+            let itemAtualParaImagem = null;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -131,6 +143,104 @@
             setTimeout(() => {
                 avisoVisual.style.opacity = '0.6';
             }, 1000);
+
+            modalFechar.addEventListener('click', () => {
+                modalImagem.style.display = 'none';
+            });
+            
+            modalImagem.addEventListener('click', (e) => {
+                if (e.target === modalImagem) {
+                    modalImagem.style.display = 'none';
+                }
+            });
+
+            function comprimirImagem(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            const maxSize = 800;
+                            if (width > maxSize || height > maxSize) {
+                                if (width > height) {
+                                    height = (height / width) * maxSize;
+                                    width = maxSize;
+                                } else {
+                                    width = (width / height) * maxSize;
+                                    height = maxSize;
+                                }
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                            resolve(base64);
+                        };
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function abrirSeletorImagem(index) {
+                itemAtualParaImagem = index;
+                uploadImagemInput.click();
+            }
+
+            uploadImagemInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file || itemAtualParaImagem === null) return;
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecione uma imagem.');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Imagem muito grande. Máximo 5MB.');
+                    return;
+                }
+                
+                try {
+                    loadingOverlay.style.display = 'flex';
+                    const imagemBase64 = await comprimirImagem(file);
+                    
+                    if (listaItens[itemAtualParaImagem]) {
+                        listaItens[itemAtualParaImagem].imagem = imagemBase64;
+                        salvarLista();
+                        renderizarLista();
+                    }
+                } catch (error) {
+                    console.error('Erro ao processar imagem:', error);
+                    alert('Erro ao processar a imagem.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                    uploadImagemInput.value = '';
+                    itemAtualParaImagem = null;
+                }
+            });
+
+            function removerImagem(index) {
+                if (listaItens[index]) {
+                    delete listaItens[index].imagem;
+                    salvarLista();
+                    renderizarLista();
+                }
+            }
+
+            function mostrarImagem(src) {
+                modalImagemConteudo.src = src;
+                modalImagem.style.display = 'flex';
+            }
 
             function moveFinaland() {
                 if (!easterEggAtivo) return;
@@ -236,22 +346,40 @@
                     const li = document.createElement('li');
                     li.className = `item-lista ${item.comprado ? 'comprado' : ''}`;
                     
+                    let imagemHtml = '';
+                    if (item.imagem) {
+                        imagemHtml = `
+                            <div class="item-imagem-container">
+                                <img src="${item.imagem}" class="item-imagem-thumb" onclick="document.getElementById('modalImagem').style.display='flex'; document.getElementById('modalImagemConteudo').src='${item.imagem}';">
+                                <button class="btn-remover-imagem" data-index="${index}" title="Remover imagem">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                    
                     li.innerHTML = `
-                        <div class="item-conteudo">
-                            <input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${index}">
-                            <span class="item-nome">${item.nome}</span>
-                            <span class="item-quantidade">${item.quantidade || 1}x</span>
-                        </div>
-                        <div class="item-acoes">
-                            <button class="btn-icon-small btn-diminuir" data-index="${index}" title="Diminuir">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <button class="btn-icon-small btn-aumentar" data-index="${index}" title="Aumentar">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                            <button class="btn-icon-small btn-remover" data-index="${index}" title="Remover">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <div class="item-principal">
+                            <div class="item-conteudo">
+                                <input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${index}">
+                                ${imagemHtml}
+                                <span class="item-nome">${item.nome}</span>
+                                <span class="item-quantidade">${item.quantidade || 1}x</span>
+                            </div>
+                            <div class="item-acoes">
+                                <button class="btn-icon-small btn-imagem" data-index="${index}" title="Adicionar imagem">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                                <button class="btn-icon-small btn-diminuir" data-index="${index}" title="Diminuir">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="btn-icon-small btn-aumentar" data-index="${index}" title="Aumentar">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="btn-icon-small btn-remover" data-index="${index}" title="Remover">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                     
@@ -302,6 +430,21 @@
                     });
                 });
                 
+                document.querySelectorAll('.btn-imagem').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        abrirSeletorImagem(index);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-remover-imagem').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const index = parseInt(this.dataset.index);
+                        removerImagem(index);
+                    });
+                });
+                
                 atualizarEstadoVazio();
             }
 
@@ -346,6 +489,9 @@
                 if (listaItens.length > 0 && listaElement.children.length === 0) {
                     renderizarLista();
                     avisoVisual.style.opacity = '1';
+                    avisoVisual.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                    avisoVisual.style.borderLeftColor = '#ffffff';
+                    avisoVisual.style.color = '#ffffff';
                     avisoVisual.querySelector('span').textContent = 'Lista restaurada! Continue editando.';
                     setTimeout(() => {
                         avisoVisual.style.opacity = '0.6';
@@ -355,7 +501,6 @@
             });
 
             btnLimparComprados.addEventListener('click', limparComprados);
-            
             btnLogout.addEventListener('click', logout);
 
             window.addEventListener('online', function() {
