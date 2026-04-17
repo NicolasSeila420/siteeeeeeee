@@ -92,7 +92,170 @@
 
     <img src="pvz.jpg" id="flying-finaland" alt="">
 
+    <button id="btnJogoSlots" class="btn-jogo-slots" title="Jogo de Slots">
+    <i class="fas fa-dice"></i>
+    <span class="saldo-jogo" id="saldoJogo">R$ 20,00</span>
+</button>
+
+<div id="modalSlots" class="modal-slots" style="display: none;">
+    <div class="slots-container">
+        <span class="modal-fechar-slots">&times;</span>
+        <h2 class="slots-titulo">🎰 Slots da Sorte 🎰</h2>
+        
+        <div class="slots-display">
+            <div class="slot-roleta" id="slot1">🍒</div>
+            <div class="slot-roleta" id="slot2">🍒</div>
+            <div class="slot-roleta" id="slot3">🍒</div>
+        </div>
+        
+        <div class="slots-info">
+            <div class="saldo-display">
+                <span>Seu saldo:</span>
+                <span id="saldoJogoModal">R$ 20,00</span>
+            </div>
+            <div class="aposta-info">
+                <span>Aposta atual:</span>
+                <span id="apostaAtual">30% do saldo</span>
+            </div>
+        </div>
+        
+        <div class="slots-mensagem" id="slotsMensagem">
+            Gire as roletas!
+        </div>
+        
+        <button id="btnGirar" class="btn-girar">
+            <i class="fas fa-sync-alt"></i>
+            GIRAR
+        </button>
+        
+        <button id="btnResetarJogo" class="btn-resetar-jogo">
+            <i class="fas fa-undo-alt"></i>
+            Recomeçar
+        </button>
+    </div>
+</div>
+
     <script>
+
+        const btnJogoSlots = document.getElementById('btnJogoSlots');
+const modalSlots = document.getElementById('modalSlots');
+const modalFecharSlots = document.querySelector('.modal-fechar-slots');
+const slot1 = document.getElementById('slot1');
+const slot2 = document.getElementById('slot2');
+const slot3 = document.getElementById('slot3');
+const saldoJogoDisplay = document.getElementById('saldoJogo');
+const saldoJogoModal = document.getElementById('saldoJogoModal');
+const slotsMensagem = document.getElementById('slotsMensagem');
+const btnGirar = document.getElementById('btnGirar');
+const btnResetarJogo = document.getElementById('btnResetarJogo');
+
+let saldoJogo = 20.00;
+let girando = false;
+
+const simbolos = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'];
+
+function atualizarDisplaySaldo() {
+    const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
+    saldoJogoDisplay.textContent = valorFormatado;
+    saldoJogoModal.textContent = valorFormatado;
+}
+
+function girarSlot(slotElement) {
+    return new Promise(resolve => {
+        let contador = 0;
+        const maxGiros = 20;
+        
+        const intervalo = setInterval(() => {
+            const simboloAleatorio = simbolos[Math.floor(Math.random() * simbolos.length)];
+            slotElement.textContent = simboloAleatorio;
+            contador++;
+            
+            if (contador >= maxGiros) {
+                clearInterval(intervalo);
+                resolve(slotElement.textContent);
+            }
+        }, 50);
+    });
+}
+
+async function girarRoletas() {
+    if (girando) return;
+    if (saldoJogo <= 0) {
+        slotsMensagem.textContent = '💰 Você está quebrado! Recomece para jogar novamente.';
+        slotsMensagem.style.color = 'var(--cor-erro)';
+        return;
+    }
+    
+    girando = true;
+    btnGirar.disabled = true;
+    slotsMensagem.textContent = '🎲 Girando...';
+    slotsMensagem.style.color = '#ffffff';
+    
+    const valorAposta = saldoJogo * 0.3;
+    
+    const [resultado1, resultado2, resultado3] = await Promise.all([
+        girarSlot(slot1),
+        girarSlot(slot2),
+        girarSlot(slot3)
+    ]);
+    
+    const ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
+    
+    if (ganhou) {
+        const ganho = saldoJogo * 0.3;
+        saldoJogo += ganho;
+        slotsMensagem.textContent = `🎉 VENCEU! Ganhou R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
+        slotsMensagem.style.color = 'var(--cor-sucesso)';
+    } else {
+        const perda = saldoJogo * 0.3;
+        saldoJogo -= perda;
+        slotsMensagem.textContent = `😢 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}. Tente novamente!`;
+        slotsMensagem.style.color = 'var(--cor-erro)';
+    }
+    
+    if (saldoJogo < 0.01) {
+        saldoJogo = 0;
+        slotsMensagem.textContent = '💔 Game Over! Clique em Recomeçar.';
+        slotsMensagem.style.color = 'var(--cor-erro)';
+    }
+    
+    atualizarDisplaySaldo();
+    girando = false;
+    btnGirar.disabled = false;
+}
+
+function resetarJogo() {
+    saldoJogo = 20.00;
+    slot1.textContent = '🍒';
+    slot2.textContent = '🍒';
+    slot3.textContent = '🍒';
+    slotsMensagem.textContent = '✨ Novo jogo! Boa sorte! ✨';
+    slotsMensagem.style.color = '#ffffff';
+    atualizarDisplaySaldo();
+    girando = false;
+    btnGirar.disabled = false;
+}
+
+btnJogoSlots.addEventListener('click', () => {
+    modalSlots.style.display = 'flex';
+    atualizarDisplaySaldo();
+});
+
+modalFecharSlots.addEventListener('click', () => {
+    modalSlots.style.display = 'none';
+});
+
+modalSlots.addEventListener('click', (e) => {
+    if (e.target === modalSlots) {
+        modalSlots.style.display = 'none';
+    }
+});
+
+btnGirar.addEventListener('click', girarRoletas);
+btnResetarJogo.addEventListener('click', resetarJogo);
+
+atualizarDisplaySaldo();
+
         window.mostrarImagem = function(src) {
             const modalImagem = document.getElementById('modalImagem');
             const modalImagemConteudo = document.getElementById('modalImagemConteudo');
