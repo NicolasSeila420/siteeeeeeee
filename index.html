@@ -118,7 +118,7 @@
             <div class="slots-info-popup">
                 <div class="aposta-info-popup">
                     <span>Aposta:</span>
-                    <span>30% do saldo</span>
+                    <span>30% do saldo | Ganha 60%</span>
                 </div>
             </div>
             
@@ -339,7 +339,7 @@
                 const ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
                 
                 if (ganhou) {
-                    const ganho = saldoJogo * 0.3;
+                    const ganho = saldoJogo * 0.6;
                     saldoJogo += ganho;
                     slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
