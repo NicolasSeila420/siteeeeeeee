@@ -74,6 +74,17 @@
 
     <div id="modalImagem" class="modal-imagem" style="display: none;">
         <span class="modal-fechar">&times;</span>
+        <div class="modal-controles">
+            <button id="modalZoomOut" class="btn-modal-controle" title="Diminuir">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <button id="modalZoomIn" class="btn-modal-controle" title="Aumentar">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button id="modalResetZoom" class="btn-modal-controle" title="Tamanho original">
+                <i class="fas fa-expand"></i>
+            </button>
+        </div>
         <img id="modalImagemConteudo" class="modal-conteudo">
     </div>
 
@@ -82,6 +93,15 @@
     <img src="pvz.jpg" id="flying-finaland" alt="">
 
     <script>
+        window.mostrarImagem = function(src) {
+            const modalImagem = document.getElementById('modalImagem');
+            const modalImagemConteudo = document.getElementById('modalImagemConteudo');
+            modalImagemConteudo.src = src;
+            modalImagemConteudo.style.transform = 'scale(1)';
+            modalImagem.style.display = 'flex';
+            if (window.zoomAtual !== undefined) window.zoomAtual = 1;
+        };
+
         (function() {
             const themeToggle = document.getElementById('themeToggle');
             const html = document.documentElement;
@@ -123,6 +143,9 @@
             const modalImagem = document.getElementById('modalImagem');
             const modalImagemConteudo = document.getElementById('modalImagemConteudo');
             const modalFechar = document.querySelector('.modal-fechar');
+            const modalZoomIn = document.getElementById('modalZoomIn');
+            const modalZoomOut = document.getElementById('modalZoomOut');
+            const modalResetZoom = document.getElementById('modalResetZoom');
             
             const flyingFinaland = document.getElementById('flying-finaland');
             let xDirection = 1;
@@ -136,6 +159,7 @@
             let listaItens = [];
             let modoOffline = false;
             let itemAtualParaImagem = null;
+            let zoomAtual = 1;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -146,12 +170,31 @@
 
             modalFechar.addEventListener('click', () => {
                 modalImagem.style.display = 'none';
+                zoomAtual = 1;
+                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
             });
             
             modalImagem.addEventListener('click', (e) => {
                 if (e.target === modalImagem) {
                     modalImagem.style.display = 'none';
+                    zoomAtual = 1;
+                    modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
                 }
+            });
+
+            modalZoomIn.addEventListener('click', () => {
+                zoomAtual = Math.min(zoomAtual + 0.25, 3);
+                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
+            });
+
+            modalZoomOut.addEventListener('click', () => {
+                zoomAtual = Math.max(zoomAtual - 0.25, 0.5);
+                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
+            });
+
+            modalResetZoom.addEventListener('click', () => {
+                zoomAtual = 1;
+                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
             });
 
             function comprimirImagem(file) {
@@ -235,11 +278,6 @@
                     salvarLista();
                     renderizarLista();
                 }
-            }
-
-            function mostrarImagem(src) {
-                modalImagemConteudo.src = src;
-                modalImagem.style.display = 'flex';
             }
 
             function moveFinaland() {
@@ -350,7 +388,7 @@
                     if (item.imagem) {
                         imagemHtml = `
                             <div class="item-imagem-container">
-                                <img src="${item.imagem}" class="item-imagem-thumb" onclick="document.getElementById('modalImagem').style.display='flex'; document.getElementById('modalImagemConteudo').src='${item.imagem}';">
+                                <img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')">
                                 <button class="btn-remover-imagem" data-index="${index}" title="Remover imagem">
                                     <i class="fas fa-times"></i>
                                 </button>
@@ -370,14 +408,14 @@
                                 <button class="btn-icon-small btn-imagem" data-index="${index}" title="Adicionar imagem">
                                     <i class="fas fa-camera"></i>
                                 </button>
-                                <button class="btn-icon-small btn-diminuir" data-index="${index}" title="Diminuir">
+                                <button class="btn-icon-small btn-diminuir" data-index="${index}" title="Diminuir quantidade">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <button class="btn-icon-small btn-aumentar" data-index="${index}" title="Aumentar">
+                                <button class="btn-icon-small btn-aumentar" data-index="${index}" title="Aumentar quantidade">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button class="btn-icon-small btn-remover" data-index="${index}" title="Remover">
-                                    <i class="fas fa-trash"></i>
+                                <button class="btn-icon-small btn-remover" data-index="${index}" title="Remover item">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
