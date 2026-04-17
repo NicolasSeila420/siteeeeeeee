@@ -109,6 +109,12 @@
         </div>
         
         <div class="popup-slots-body">
+            <div class="dificuldade-selector">
+                <button class="btn-dificuldade active" data-dificuldade="facil">Fácil</button>
+                <button class="btn-dificuldade" data-dificuldade="medio">Médio</button>
+                <button class="btn-dificuldade" data-dificuldade="dificil">Difícil</button>
+            </div>
+            
             <div class="slots-display">
                 <div class="slot-roleta" id="slot1">🍒</div>
                 <div class="slot-roleta" id="slot2">🍒</div>
@@ -117,8 +123,8 @@
             
             <div class="slots-info-popup">
                 <div class="aposta-info-popup">
-                    <span>Aposta:</span>
-                    <span>30% do saldo | Ganha 60%</span>
+                    <span>Regras:</span>
+                    <span id="regrasDificuldade">Perde 20% | Ganha 150%</span>
                 </div>
             </div>
             
@@ -208,6 +214,8 @@
             const slotsMensagemPopup = document.getElementById('slotsMensagemPopup');
             const btnGirarPopup = document.getElementById('btnGirarPopup');
             const btnResetarJogoPopup = document.getElementById('btnResetarJogoPopup');
+            const regrasSpan = document.getElementById('regrasDificuldade');
+            const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
             
             const flyingFinaland = document.getElementById('flying-finaland');
             let xDirection = 1;
@@ -225,7 +233,13 @@
             
             let saldoJogo = 20.00;
             let girando = false;
+            let dificuldadeAtual = 'facil';
             const simbolos = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'];
+            const regrasDificuldade = {
+                facil: { perda: 0.2, ganho: 1.5, texto: 'Perde 20% | Ganha 150%' },
+                medio: { perda: 0.3, ganho: 0.6, texto: 'Perde 30% | Ganha 60%' },
+                dificil: { perda: 0.7, ganho: 0.3, texto: 'Perde 70% | Ganha 30%' }
+            };
             
             let isDragging = false;
             let currentX;
@@ -294,6 +308,18 @@
             popupSlotsHeader.addEventListener("mouseup", dragEnd, false);
             popupSlotsHeader.addEventListener("mousemove", drag, false);
 
+            botoesDificuldade.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const dificuldade = btn.dataset.dificuldade;
+                    dificuldadeAtual = dificuldade;
+                    
+                    botoesDificuldade.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    regrasSpan.textContent = regrasDificuldade[dificuldade].texto;
+                });
+            });
+
             function atualizarDisplaySaldo() {
                 const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
                 popupSaldoJogo.textContent = valorFormatado;
@@ -337,14 +363,15 @@
                 ]);
                 
                 const ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
+                const regra = regrasDificuldade[dificuldadeAtual];
                 
                 if (ganhou) {
-                    const ganho = saldoJogo * 0.6;
+                    const ganho = saldoJogo * regra.ganho;
                     saldoJogo += ganho;
                     slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
                 } else {
-                    const perda = saldoJogo * 0.3;
+                    const perda = saldoJogo * regra.perda;
                     saldoJogo -= perda;
                     slotsMensagemPopup.textContent = `😢 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
                     slotsMensagemPopup.style.color = 'var(--cor-erro)';

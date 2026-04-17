@@ -824,6 +824,54 @@ body {
     padding: 24px 20px;
 }
 
+.dificuldade-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 6px;
+    border-radius: 50px;
+}
+
+.btn-dificuldade {
+    flex: 1;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    border-radius: 40px;
+    color: var(--cor-primaria-2);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-dificuldade:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cor-primaria-1);
+}
+
+.btn-dificuldade.active {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.btn-dificuldade[data-dificuldade="facil"].active {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.btn-dificuldade[data-dificuldade="medio"].active {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.btn-dificuldade[data-dificuldade="dificil"].active {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
 .slots-display {
     display: flex;
     justify-content: center;
