@@ -166,7 +166,7 @@
             <div class="vendedora-container">
                 <img src="vendedoragostosa.png" alt="Vendedora" class="vendedora-img" id="vendedoraImg">
                 <div class="vendedora-fala" id="vendedoraFala">
-                    Bem-vindo! Veja meus itens!
+                    O que tu precisa?
                 </div>
             </div>
             
@@ -185,14 +185,6 @@
                     <div class="item-preco">R$ 270</div>
                     <div class="item-descricao">Adiciona Pimenta. 2 vitórias = próxima vitória +700%</div>
                     <button class="btn-comprar-item" data-item="pimenta">Comprar</button>
-                </div>
-                
-                <div class="item-loja" data-item="dado">
-                    <div class="item-icone">🎲</div>
-                    <div class="item-nome-loja">Dado Viciado</div>
-                    <div class="item-preco">R$ 50</div>
-                    <div class="item-descricao">+10% de chance de vitória (acumulativo)</div>
-                    <button class="btn-comprar-item" data-item="dado">Comprar</button>
                 </div>
             </div>
             
@@ -310,56 +302,68 @@
                 dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
             };
             
-            let inventario = { uva: 0, pimenta: 0, dado: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
-            const precosItens = { uva: 150, pimenta: 270, dado: 50 };
-            
-            let isDragging = false, isDraggingLoja = false;
-            let currentX, currentY, initialX, initialY;
-            let xOffset = 0, yOffset = 0, lojaOffsetX = 0, lojaOffsetY = 0;
+            let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
+            const precosItens = { uva: 150, pimenta: 270 };
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
             setTimeout(() => avisoVisual.style.opacity = '0.6', 1000);
 
-            function dragStart(e, popup, offsetX, offsetY, setDragging) {
-                if (e.target.closest('button')) return;
-                const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
-                initialX = clientX - offsetX;
-                initialY = clientY - offsetY;
-                setDragging(true);
-                popup.style.cursor = 'grabbing';
+            let isDraggingSlots = false, isDraggingLoja = false;
+            let startX, startY, offsetX = 0, offsetY = 0, lojaOffsetX = 0, lojaOffsetY = 0;
+
+            function makeDraggable(popup, header, offsetState, setDragging) {
+                let startX, startY;
+                
+                header.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('button')) return;
+                    e.preventDefault();
+                    startX = e.clientX - offsetState.x;
+                    startY = e.clientY - offsetState.y;
+                    setDragging(true);
+                    popup.style.cursor = 'grabbing';
+                });
+                
+                header.addEventListener('touchstart', (e) => {
+                    if (e.target.closest('button')) return;
+                    startX = e.touches[0].clientX - offsetState.x;
+                    startY = e.touches[0].clientY - offsetState.y;
+                    setDragging(true);
+                    popup.style.cursor = 'grabbing';
+                }, { passive: false });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!setDragging()) return;
+                    e.preventDefault();
+                    offsetState.x = e.clientX - startX;
+                    offsetState.y = e.clientY - startY;
+                    popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (!setDragging()) return;
+                    e.preventDefault();
+                    offsetState.x = e.touches[0].clientX - startX;
+                    offsetState.y = e.touches[0].clientY - startY;
+                    popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
+                }, { passive: false });
+                
+                document.addEventListener('mouseup', () => {
+                    setDragging(false);
+                    popup.style.cursor = 'default';
+                });
+                
+                document.addEventListener('touchend', () => {
+                    setDragging(false);
+                    popup.style.cursor = 'default';
+                });
             }
 
-            function dragEnd(setDragging, popup) {
-                setDragging(false);
-                popup.style.cursor = 'default';
-            }
-
-            function drag(e, popup, setOffset, isDraggingFlag) {
-                if (!isDraggingFlag) return;
-                e.preventDefault();
-                const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
-                currentX = clientX - initialX;
-                currentY = clientY - initialY;
-                setOffset(currentX, currentY);
-                popup.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px))`;
-            }
-
-            popupSlotsHeader.addEventListener("touchstart", (e) => dragStart(e, popupSlots, xOffset, (v) => isDragging = v));
-            popupSlotsHeader.addEventListener("touchend", () => dragEnd((v) => isDragging = v, popupSlots));
-            popupSlotsHeader.addEventListener("touchmove", (e) => drag(e, popupSlots, (x, y) => { xOffset = x; yOffset = y; }, isDragging));
-            popupSlotsHeader.addEventListener("mousedown", (e) => dragStart(e, popupSlots, xOffset, (v) => isDragging = v));
-            popupSlotsHeader.addEventListener("mouseup", () => dragEnd((v) => isDragging = v, popupSlots));
-            popupSlotsHeader.addEventListener("mousemove", (e) => drag(e, popupSlots, (x, y) => { xOffset = x; yOffset = y; }, isDragging));
-
-            popupLojaHeader.addEventListener("touchstart", (e) => dragStart(e, popupLoja, lojaOffsetX, (v) => isDraggingLoja = v));
-            popupLojaHeader.addEventListener("touchend", () => dragEnd((v) => isDraggingLoja = v, popupLoja));
-            popupLojaHeader.addEventListener("touchmove", (e) => drag(e, popupLoja, (x, y) => { lojaOffsetX = x; lojaOffsetY = y; }, isDraggingLoja));
-            popupLojaHeader.addEventListener("mousedown", (e) => dragStart(e, popupLoja, lojaOffsetX, (v) => isDraggingLoja = v));
-            popupLojaHeader.addEventListener("mouseup", () => dragEnd((v) => isDraggingLoja = v, popupLoja));
-            popupLojaHeader.addEventListener("mousemove", (e) => drag(e, popupLoja, (x, y) => { lojaOffsetX = x; lojaOffsetY = y; }, isDraggingLoja));
+            const slotsOffset = { x: 0, y: 0 };
+            const lojaOffset = { x: 0, y: 0 };
+            
+            makeDraggable(popupSlots, popupSlotsHeader, slotsOffset, () => isDraggingSlots, (v) => isDraggingSlots = v);
+            makeDraggable(popupLoja, popupLojaHeader, lojaOffset, () => isDraggingLoja, (v) => isDraggingLoja = v);
 
             botoesDificuldade.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -380,7 +384,6 @@
                 const itens = [];
                 if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
                 if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
-                if (inventario.dado > 0) itens.push(`${inventario.dado}x 🎲 Dado (${inventario.dado * 10}% chance)`);
                 inventarioItens.innerHTML = itens.length ? itens.map(i => `<span class="inventario-item">${i}</span>`).join('') : '<span class="inventario-vazio">Nenhum item comprado</span>';
             }
 
@@ -389,7 +392,7 @@
                 if (saldoJogo < preco) {
                     vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
                     vendedoraFala.style.color = 'var(--cor-erro)';
-                    setTimeout(() => { vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
+                    setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
                     return;
                 }
                 saldoJogo -= preco;
@@ -397,8 +400,8 @@
                 if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
                 if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
                 vendedoraFala.style.color = 'var(--cor-sucesso)';
-                vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar com ela!' : item === 'pimenta' ? '🌶️ Pimenta comprada! 2 vitórias = +700%!' : `🎲 Chance +${inventario.dado * 10}%!`;
-                setTimeout(() => { vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
+                vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar!' : '🌶️ Pimenta comprada! 2 vitórias = +700%!';
+                setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
                 atualizarDisplaySaldo();
                 atualizarInventario();
             }
@@ -407,7 +410,7 @@
                 if (popupSlots.style.display === 'block') popupSlots.style.display = 'none';
                 popupLoja.style.display = 'block';
                 popupLoja.style.transform = 'translate(-50%, -50%)';
-                lojaOffsetX = lojaOffsetY = 0;
+                lojaOffset.x = lojaOffset.y = 0;
                 atualizarDisplaySaldo();
                 atualizarInventario();
             }
@@ -425,7 +428,6 @@
                 slotsMensagemPopup.textContent = '🎲 Girando...'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
                 const [r1, r2, r3] = await Promise.all([girarSlot(slot1), girarSlot(slot2), girarSlot(slot3)]);
                 let ganhou = r1 === r2 && r2 === r3;
-                if (!ganhou && inventario.dado > 0 && Math.random() < inventario.dado * 0.1) { ganhou = true; slotsMensagemPopup.textContent = '🎲 Dado Viciado salvou!'; }
                 const regra = regrasDificuldade[dificuldadeAtual];
                 let mult = 1;
                 if (ganhou) {
@@ -455,7 +457,7 @@
                 saldoJogo = 20.00;
                 slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
                 slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                inventario = { uva: 0, pimenta: 0, dado: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
+                inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
                 simbolos = ['🍒', '💎', '7️⃣'];
                 atualizarDisplaySaldo(); atualizarInventario();
                 girando = false; btnGirarPopup.disabled = false;
@@ -465,7 +467,7 @@
                 if (popupLoja.style.display === 'block') popupLoja.style.display = 'none';
                 popupSlots.style.display = 'block';
                 popupSlots.style.transform = 'translate(-50%, -50%)';
-                xOffset = yOffset = 0;
+                slotsOffset.x = slotsOffset.y = 0;
                 atualizarDisplaySaldo();
             }
 

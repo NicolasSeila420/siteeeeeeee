@@ -264,14 +264,8 @@ body {
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .item-lista:hover {
@@ -624,15 +618,9 @@ body {
 }
 
 @keyframes pulseGlow {
-    0% {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(243, 156, 18, 0.7);
-    }
-    50% {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 8px rgba(243, 156, 18, 0);
-    }
-    100% {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(243, 156, 18, 0);
-    }
+    0% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(243, 156, 18, 0.7); }
+    50% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 8px rgba(243, 156, 18, 0); }
+    100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(243, 156, 18, 0); }
 }
 
 .btn-jogo-slots:hover {
@@ -780,7 +768,6 @@ body {
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-color);
     overflow: hidden;
-    transition: box-shadow 0.3s ease;
     user-select: none;
     overflow-y: auto;
 }
@@ -1023,24 +1010,24 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .vendedora-img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #f39c12;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    margin-bottom: 8px;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border: none;
+    border-bottom: 2px solid #f39c12;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 .vendedora-fala {
-    background: rgba(0,0,0,0.05);
-    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 16px;
     border-radius: 30px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--cor-primaria-2);
     text-align: center;
     max-width: 90%;
@@ -1049,16 +1036,16 @@ body {
 
 .itens-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin-bottom: 20px;
 }
 
 .item-loja {
-    background: rgba(0,0,0,0.03);
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 10px 6px;
+    border-radius: 16px;
+    padding: 14px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1068,7 +1055,7 @@ body {
 }
 
 .item-loja:hover {
-    background: rgba(0,0,0,0.06);
+    background: rgba(0, 0, 0, 0.06);
     border-color: #f39c12;
     transform: translateY(-2px);
 }
@@ -1079,22 +1066,22 @@ body {
 }
 
 .item-icone {
-    font-size: 1.8rem;
-    margin-bottom: 2px;
+    font-size: 2.2rem;
+    margin-bottom: 4px;
 }
 
 .item-nome-loja {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--cor-primaria-1);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
 .item-preco {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: bold;
     color: #f39c12;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .item-descricao {
@@ -1106,11 +1093,11 @@ body {
     backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 5px 8px;
-    font-size: 0.65rem;
+    padding: 6px 10px;
+    font-size: 0.7rem;
     color: var(--cor-primaria-1);
     white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s;
@@ -1121,12 +1108,12 @@ body {
 
 .btn-comprar-item {
     width: 100%;
-    padding: 5px;
+    padding: 6px;
     background: linear-gradient(135deg, #f39c12, #e67e22);
     border: none;
     border-radius: 20px;
     color: #fff;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
@@ -1143,9 +1130,9 @@ body {
 }
 
 .inventario-container h4 {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--cor-primaria-1);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .inventario-itens {
@@ -1155,17 +1142,17 @@ body {
 }
 
 .inventario-item {
-    background: rgba(243,156,18,0.12);
+    background: rgba(243, 156, 18, 0.12);
     border: 1px solid #f39c12;
     border-radius: 20px;
-    padding: 3px 8px;
-    font-size: 0.7rem;
+    padding: 4px 10px;
+    font-size: 0.75rem;
     color: var(--cor-primaria-1);
 }
 
 .inventario-vazio {
     color: var(--cor-primaria-3);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-style: italic;
 }
 
@@ -1178,124 +1165,29 @@ body {
 }
 
 @media (max-width: 480px) {
-    body {
-        padding: 8px;
-    }
-    
-    .aviso-visual {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        justify-content: center;
-    }
-    
-    .app-container {
-        min-height: calc(100vh - 16px);
-    }
-    
-    .app-header {
-        padding: 16px;
-    }
-    
-    .app-titulo {
-        font-size: 1.5rem;
-    }
-    
-    .app-main {
-        padding: 16px;
-    }
-    
-    .input-container {
-        flex-direction: column;
-    }
-    
-    .btn-primario {
-        justify-content: center;
-    }
-    
-    .item-principal {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .item-acoes {
-        justify-content: flex-end;
-    }
-    
-    .item-imagem-thumb {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .botoes-flutuantes {
-        bottom: 16px;
-        right: 16px;
-        gap: 10px;
-    }
-    
-    .theme-toggle, .btn-jogo-slots, .btn-loja {
-        width: 44px;
-        height: 44px;
-    }
-    
-    .modal-controles {
-        bottom: 20px;
-        padding: 8px 16px;
-        gap: 8px;
-    }
-    
-    .btn-modal-controle {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-    }
-    
-    .modal-fechar {
-        top: 10px;
-        right: 15px;
-        font-size: 30px;
-    }
-    
-    .item-acoes {
-        gap: 4px;
-        padding: 3px;
-    }
-    
-    .btn-icon-small {
-        width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
-    }
-    
-    .popup-slots {
-        width: 340px;
-    }
-    
-    .slot-roleta {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
-    }
-    
-    .itens-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .item-loja {
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 8px 12px;
-    }
-    
-    .item-icone {
-        font-size: 1.5rem;
-        margin: 0;
-    }
-    
-    .item-descricao {
-        white-space: normal;
-        width: 180px;
-    }
+    body { padding: 8px; }
+    .aviso-visual { top: 8px; left: 8px; right: 8px; font-size: 0.75rem; padding: 6px 12px; justify-content: center; }
+    .app-container { min-height: calc(100vh - 16px); }
+    .app-header { padding: 16px; }
+    .app-titulo { font-size: 1.5rem; }
+    .app-main { padding: 16px; }
+    .input-container { flex-direction: column; }
+    .btn-primario { justify-content: center; }
+    .item-principal { flex-direction: column; align-items: stretch; }
+    .item-acoes { justify-content: flex-end; }
+    .item-imagem-thumb { width: 32px; height: 32px; }
+    .botoes-flutuantes { bottom: 16px; right: 16px; gap: 10px; }
+    .theme-toggle, .btn-jogo-slots, .btn-loja { width: 44px; height: 44px; }
+    .modal-controles { bottom: 20px; padding: 8px 16px; gap: 8px; }
+    .btn-modal-controle { width: 40px; height: 40px; font-size: 1rem; }
+    .modal-fechar { top: 10px; right: 15px; font-size: 30px; }
+    .item-acoes { gap: 4px; padding: 3px; }
+    .btn-icon-small { width: 32px; height: 32px; font-size: 0.85rem; }
+    .popup-slots { width: 340px; }
+    .slot-roleta { width: 70px; height: 70px; font-size: 2rem; }
+    .itens-grid { grid-template-columns: 1fr; }
+    .item-loja { flex-direction: row; justify-content: space-between; padding: 10px 14px; }
+    .item-icone { font-size: 1.8rem; margin: 0; }
+    .item-descricao { white-space: normal; width: 180px; }
+    .vendedora-img { width: 80px; height: 80px; }
 }
