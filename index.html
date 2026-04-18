@@ -124,7 +124,7 @@
             <div class="slots-info-popup">
                 <div class="aposta-info-popup">
                     <span>Regras:</span>
-                    <span id="regrasDificuldade">Perde 20% | Ganha 250%</span>
+                    <span id="regrasDificuldade">Perde R$ 10% | Ganha R$ 300%</span>
                 </div>
             </div>
             
@@ -287,9 +287,9 @@
             let saldoJogo = 20.00, girando = false, dificuldadeAtual = 'facil';
             let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
-                facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
-                medio: { perda: 0.4, ganho: 1.0, texto: 'Perde 40% | Ganha 100%' },
-                dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
+                facil: { perda: 0.1, ganho: 3.0, texto: 'Perde R$ 10% | Ganha R$ 300%' },
+                medio: { perda: 0.3, ganho: 2.0, texto: 'Perde R$ 30% | Ganha R$ 200%' },
+                dificil: { perda: 0.5, ganho: 1.0, texto: 'Perde R$ 50% | Ganha R$ 100%' }
             };
             
             let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
