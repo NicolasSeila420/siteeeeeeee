@@ -377,42 +377,39 @@
             }
 
             function comprarItem(item) {
-    // Verifica se já comprou este item
-    if (inventario[item] >= 1) {
-        vendedoraFala.textContent = item === 'uva' ? '🍇 Você já tem a Uva!' : '🌶️ Você já tem a Pimenta!';
-        vendedoraFala.style.color = 'var(--cor-erro)';
-        setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
-        return;
-    }
-    
-    const preco = precosItens[item];
-    if (saldoJogo < preco) {
-        vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
-        vendedoraFala.style.color = 'var(--cor-erro)';
-        setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
-        return;
-    }
-    saldoJogo -= preco;
-    inventario[item]++;
-    if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
-    if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
-    vendedoraFala.style.color = 'var(--cor-sucesso)';
-    vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar!' : '🌶️ Pimenta comprada! 2 vitórias = +700%!';
-    setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
-    atualizarDisplaySaldo();
-    atualizarInventario();
-    
-    // Desabilita o botão de comprar após a compra
-    const botoes = document.querySelectorAll('.btn-comprar-item');
-    botoes.forEach(btn => {
-        if (btn.dataset.item === item) {
-            btn.disabled = true;
-            btn.textContent = 'Comprado';
-            btn.style.opacity = '0.6';
-            btn.style.cursor = 'not-allowed';
-        }
-    });
-}
+                const preco = precosItens[item];
+                if (saldoJogo < preco) {
+                    vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
+                    vendedoraFala.style.color = 'var(--cor-erro)';
+                    setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
+                    return;
+                }
+                saldoJogo -= preco;
+                inventario[item]++;
+                if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
+                if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
+                vendedoraFala.style.color = 'var(--cor-sucesso)';
+                vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar!' : '🌶️ Pimenta comprada! 2 vitórias = +700%!';
+                setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
+                atualizarDisplaySaldo();
+                atualizarInventario();
+            }
+
+            function abrirPopupLoja() {
+                popupSlots.style.display = 'none';
+                popupLoja.style.display = 'block';
+                popupLoja.style.transform = 'translate(-50%, -50%)';
+                lojaOffset.x = lojaOffset.y = 0;
+                atualizarDisplaySaldo();
+                atualizarInventario();
+            }
+
+            function girarSlot(el) {
+                return new Promise(r => {
+                    let c = 0;
+                    const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 20) { clearInterval(i); r(el.textContent); } }, 50);
+                });
+            }
 
             async function girarRoletas() {
                 if (girando || saldoJogo <= 0) { if (saldoJogo <= 0) { slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.'; slotsMensagemPopup.style.color = 'var(--cor-erro)'; } return; }
