@@ -124,7 +124,7 @@
             <div class="slots-info-popup">
                 <div class="aposta-info-popup">
                     <span>Regras:</span>
-                    <span id="regrasDificuldade">Perde R$ 10% | Ganha R$ 300%</span>
+                    <span id="regrasDificuldade">Perde 20% | Ganha 250%</span>
                 </div>
             </div>
             
@@ -287,9 +287,9 @@
             let saldoJogo = 20.00, girando = false, dificuldadeAtual = 'facil';
             let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
-                facil: { perda: 0.1, ganho: 3.0, texto: 'Perde R$ 10% | Ganha R$ 300%' },
-                medio: { perda: 0.3, ganho: 2.0, texto: 'Perde R$ 30% | Ganha R$ 200%' },
-                dificil: { perda: 0.6, ganho: 1.0, texto: 'Perde R$ 60% | Ganha R$ 100%' }
+                facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
+                medio: { perda: 0.4, ganho: 1.0, texto: 'Perde 40% | Ganha 100%' },
+                dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
             };
             
             let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
@@ -354,14 +354,14 @@
             makeDraggable(popupLoja, popupLojaHeader, lojaOffset, () => isDraggingLoja, (v) => isDraggingLoja = v);
 
             botoesDificuldade.forEach(btn => {
-          btn.addEventListener('click', () => {
-         dificuldadeAtual = btn.dataset.dificuldade;
-            botoesDificuldade.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-         regrasSpan.textContent = regrasDificuldade[dificuldadeAtual].texto;
-            resetarJogo(); // ← ADICIONE ESTA LINHA
-        });
-    });
+                btn.addEventListener('click', () => {
+                    dificuldadeAtual = btn.dataset.dificuldade;
+                    botoesDificuldade.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    regrasSpan.textContent = regrasDificuldade[dificuldadeAtual].texto;
+                    resetarJogo();
+                });
+            });
 
             function atualizarDisplaySaldo() {
                 const valor = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
@@ -371,12 +371,19 @@
 
             function atualizarInventario() {
                 const itens = [];
-                if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
-                if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
+                if (inventario.uva > 0) itens.push(`1x 🍇 Uva`);
+                if (inventario.pimenta > 0) itens.push(`1x 🌶️ Pimenta`);
                 inventarioItens.innerHTML = itens.length ? itens.map(i => `<span class="inventario-item">${i}</span>`).join('') : '<span class="inventario-vazio">Nenhum item comprado</span>';
             }
 
             function comprarItem(item) {
+                if (inventario[item] >= 1) {
+                    vendedoraFala.textContent = item === 'uva' ? '🍇 Você já tem a Uva!' : '🌶️ Você já tem a Pimenta!';
+                    vendedoraFala.style.color = 'var(--cor-erro)';
+                    setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
+                    return;
+                }
+                
                 const preco = precosItens[item];
                 if (saldoJogo < preco) {
                     vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
@@ -393,6 +400,16 @@
                 setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
                 atualizarDisplaySaldo();
                 atualizarInventario();
+                
+                const botoes = document.querySelectorAll('.btn-comprar-item');
+                botoes.forEach(btn => {
+                    if (btn.dataset.item === item) {
+                        btn.disabled = true;
+                        btn.textContent = 'Comprado';
+                        btn.style.opacity = '0.6';
+                        btn.style.cursor = 'not-allowed';
+                    }
+                });
             }
 
             function abrirPopupLoja() {
@@ -450,6 +467,13 @@
                 simbolos = ['🍒', '💎', '7️⃣'];
                 atualizarDisplaySaldo(); atualizarInventario();
                 girando = false; btnGirarPopup.disabled = false;
+                
+                document.querySelectorAll('.btn-comprar-item').forEach(btn => {
+                    btn.disabled = false;
+                    btn.textContent = 'Comprar';
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
             }
 
             function abrirPopupSlots() {
