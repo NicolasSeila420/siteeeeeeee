@@ -78,8 +78,7 @@
         </button>
         
         <button id="btnLoja" class="btn-loja" aria-label="Loja">
-            <img src="iconvendedoragostosamodoclaro.png" alt="Loja" class="loja-icon claro">
-            <img src="iconvendedoragostosamodoescuro.png" alt="Loja" class="loja-icon escuro">
+            <img src="iconvendedoragostosamodoclaro.png" alt="Loja" id="lojaIcon">
         </button>
     </div>
 
@@ -149,21 +148,21 @@
         </div>
     </div>
 
-    <div id="popupLoja" class="popup-loja" style="display: none;">
-        <div class="popup-loja-header" id="popupLojaHeader">
-            <h3 class="popup-loja-titulo">
+    <div id="popupLoja" class="popup-slots" style="display: none;">
+        <div class="popup-slots-header" id="popupLojaHeader">
+            <h3 class="popup-slots-titulo">
                 <i class="fas fa-store"></i>
                 Loja da Sorte
             </h3>
-            <div class="popup-loja-acoes">
-                <span class="loja-saldo" id="lojaSaldo">R$ 20,00</span>
+            <div class="popup-slots-acoes">
+                <span class="popup-saldo" id="lojaSaldo">R$ 20,00</span>
                 <button id="popupFecharLoja" class="popup-fechar" aria-label="Fechar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
         
-        <div class="popup-loja-body">
+        <div class="popup-slots-body">
             <div class="vendedora-container">
                 <img src="vendedoragostosa.png" alt="Vendedora" class="vendedora-img" id="vendedoraImg">
                 <div class="vendedora-fala" id="vendedoraFala">
@@ -175,7 +174,7 @@
                 <div class="item-loja" data-item="uva">
                     <div class="item-icone">🍇</div>
                     <div class="item-nome-loja">Uva da Sorte</div>
-                    <div class="item-preco">R$ 150,00</div>
+                    <div class="item-preco">R$ 150</div>
                     <div class="item-descricao">Adiciona Uva aos slots. Ganhar com Uva = +400%</div>
                     <button class="btn-comprar-item" data-item="uva">Comprar</button>
                 </div>
@@ -183,7 +182,7 @@
                 <div class="item-loja" data-item="pimenta">
                     <div class="item-icone">🌶️</div>
                     <div class="item-nome-loja">Pimenta Ardente</div>
-                    <div class="item-preco">R$ 270,00</div>
+                    <div class="item-preco">R$ 270</div>
                     <div class="item-descricao">Adiciona Pimenta. 2 vitórias = próxima vitória +700%</div>
                     <button class="btn-comprar-item" data-item="pimenta">Comprar</button>
                 </div>
@@ -191,7 +190,7 @@
                 <div class="item-loja" data-item="dado">
                     <div class="item-icone">🎲</div>
                     <div class="item-nome-loja">Dado Viciado</div>
-                    <div class="item-preco">R$ 50,00</div>
+                    <div class="item-preco">R$ 50</div>
                     <div class="item-descricao">+10% de chance de vitória (acumulativo)</div>
                     <button class="btn-comprar-item" data-item="dado">Comprar</button>
                 </div>
@@ -223,6 +222,7 @@
         (function() {
             const themeToggle = document.getElementById('themeToggle');
             const html = document.documentElement;
+            const lojaIcon = document.getElementById('lojaIcon');
             
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
@@ -231,11 +231,21 @@
                 html.setAttribute('data-theme', 'dark');
             }
             
+            function atualizarIconLoja() {
+                const temaAtual = html.getAttribute('data-theme') || 'light';
+                lojaIcon.src = temaAtual === 'dark' 
+                    ? 'iconvendedoragostosamodoescuro.png' 
+                    : 'iconvendedoragostosamodoclaro.png';
+            }
+            
+            atualizarIconLoja();
+            
             themeToggle.addEventListener('click', () => {
                 const currentTheme = html.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 html.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
+                atualizarIconLoja();
             });
         })();
 
@@ -288,22 +298,11 @@
             const inventarioItens = document.getElementById('inventarioItens');
             
             const flyingFinaland = document.getElementById('flying-finaland');
-            let xDirection = 1;
-            let yDirection = 1;
-            let xPosition = 0;
-            let yPosition = 0;
-            let speed = 9;
-            let easterEggAtivo = false;
-            let easterEggTimeout = null;
-            let jumpscareTimeout = null;
-            let listaItens = [];
-            let modoOffline = false;
-            let itemAtualParaImagem = null;
-            let zoomAtual = 1;
+            let xDirection = 1, yDirection = 1, xPosition = 0, yPosition = 0, speed = 9;
+            let easterEggAtivo = false, easterEggTimeout = null, jumpscareTimeout = null;
+            let listaItens = [], modoOffline = false, itemAtualParaImagem = null, zoomAtual = 1;
             
-            let saldoJogo = 20.00;
-            let girando = false;
-            let dificuldadeAtual = 'facil';
+            let saldoJogo = 20.00, girando = false, dificuldadeAtual = 'facil';
             let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
                 facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
@@ -311,153 +310,70 @@
                 dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
             };
             
-            let inventario = {
-                uva: 0,
-                pimenta: 0,
-                dado: 0,
-                vitoriasConsecutivas: 0,
-                pimentaAtiva: false
-            };
+            let inventario = { uva: 0, pimenta: 0, dado: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
+            const precosItens = { uva: 150, pimenta: 270, dado: 50 };
             
-            const precosItens = {
-                uva: 150,
-                pimenta: 270,
-                dado: 50
-            };
-            
-            let isDragging = false;
-            let isDraggingLoja = false;
+            let isDragging = false, isDraggingLoja = false;
             let currentX, currentY, initialX, initialY;
-            let xOffset = 0, yOffset = 0;
-            let lojaOffsetX = 0, lojaOffsetY = 0;
+            let xOffset = 0, yOffset = 0, lojaOffsetX = 0, lojaOffsetY = 0;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
-            
-            setTimeout(() => {
-                avisoVisual.style.opacity = '0.6';
-            }, 1000);
+            setTimeout(() => avisoVisual.style.opacity = '0.6', 1000);
 
-            function dragStart(e) {
+            function dragStart(e, popup, offsetX, offsetY, setDragging) {
                 if (e.target.closest('button')) return;
-                
-                if (e.type === "touchstart") {
-                    initialX = e.touches[0].clientX - xOffset;
-                    initialY = e.touches[0].clientY - yOffset;
-                } else {
-                    initialX = e.clientX - xOffset;
-                    initialY = e.clientY - yOffset;
-                }
-                
-                isDragging = true;
-                popupSlots.style.cursor = 'grabbing';
+                const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+                initialX = clientX - offsetX;
+                initialY = clientY - offsetY;
+                setDragging(true);
+                popup.style.cursor = 'grabbing';
             }
 
-            function dragEnd(e) {
-                initialX = currentX;
-                initialY = currentY;
-                isDragging = false;
-                popupSlots.style.cursor = 'default';
+            function dragEnd(setDragging, popup) {
+                setDragging(false);
+                popup.style.cursor = 'default';
             }
 
-            function drag(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    
-                    if (e.type === "touchmove") {
-                        currentX = e.touches[0].clientX - initialX;
-                        currentY = e.touches[0].clientY - initialY;
-                    } else {
-                        currentX = e.clientX - initialX;
-                        currentY = e.clientY - initialY;
-                    }
-                    
-                    xOffset = currentX;
-                    yOffset = currentY;
-                    
-                    setTranslate(currentX, currentY, popupSlots);
-                }
+            function drag(e, popup, setOffset, isDraggingFlag) {
+                if (!isDraggingFlag) return;
+                e.preventDefault();
+                const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                currentX = clientX - initialX;
+                currentY = clientY - initialY;
+                setOffset(currentX, currentY);
+                popup.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px))`;
             }
 
-            function setTranslate(xPos, yPos, el) {
-                el.style.transform = `translate(calc(-50% + ${xPos}px), calc(-50% + ${yPos}px))`;
-            }
+            popupSlotsHeader.addEventListener("touchstart", (e) => dragStart(e, popupSlots, xOffset, (v) => isDragging = v));
+            popupSlotsHeader.addEventListener("touchend", () => dragEnd((v) => isDragging = v, popupSlots));
+            popupSlotsHeader.addEventListener("touchmove", (e) => drag(e, popupSlots, (x, y) => { xOffset = x; yOffset = y; }, isDragging));
+            popupSlotsHeader.addEventListener("mousedown", (e) => dragStart(e, popupSlots, xOffset, (v) => isDragging = v));
+            popupSlotsHeader.addEventListener("mouseup", () => dragEnd((v) => isDragging = v, popupSlots));
+            popupSlotsHeader.addEventListener("mousemove", (e) => drag(e, popupSlots, (x, y) => { xOffset = x; yOffset = y; }, isDragging));
 
-            function dragStartLoja(e) {
-                if (e.target.closest('button')) return;
-                
-                if (e.type === "touchstart") {
-                    initialX = e.touches[0].clientX - lojaOffsetX;
-                    initialY = e.touches[0].clientY - lojaOffsetY;
-                } else {
-                    initialX = e.clientX - lojaOffsetX;
-                    initialY = e.clientY - lojaOffsetY;
-                }
-                
-                isDraggingLoja = true;
-                popupLoja.style.cursor = 'grabbing';
-            }
-
-            function dragEndLoja(e) {
-                initialX = currentX;
-                initialY = currentY;
-                isDraggingLoja = false;
-                popupLoja.style.cursor = 'default';
-            }
-
-            function dragLoja(e) {
-                if (isDraggingLoja) {
-                    e.preventDefault();
-                    
-                    if (e.type === "touchmove") {
-                        currentX = e.touches[0].clientX - initialX;
-                        currentY = e.touches[0].clientY - initialY;
-                    } else {
-                        currentX = e.clientX - initialX;
-                        currentY = e.clientY - initialY;
-                    }
-                    
-                    lojaOffsetX = currentX;
-                    lojaOffsetY = currentY;
-                    
-                    popupLoja.style.transform = `translate(calc(-50% + ${lojaOffsetX}px), calc(-50% + ${lojaOffsetY}px))`;
-                }
-            }
-
-            popupSlotsHeader.addEventListener("touchstart", dragStart, false);
-            popupSlotsHeader.addEventListener("touchend", dragEnd, false);
-            popupSlotsHeader.addEventListener("touchmove", drag, false);
-            popupSlotsHeader.addEventListener("mousedown", dragStart, false);
-            popupSlotsHeader.addEventListener("mouseup", dragEnd, false);
-            popupSlotsHeader.addEventListener("mousemove", drag, false);
-
-            popupLojaHeader.addEventListener("touchstart", dragStartLoja, false);
-            popupLojaHeader.addEventListener("touchend", dragEndLoja, false);
-            popupLojaHeader.addEventListener("touchmove", dragLoja, false);
-            popupLojaHeader.addEventListener("mousedown", dragStartLoja, false);
-            popupLojaHeader.addEventListener("mouseup", dragEndLoja, false);
-            popupLojaHeader.addEventListener("mousemove", dragLoja, false);
+            popupLojaHeader.addEventListener("touchstart", (e) => dragStart(e, popupLoja, lojaOffsetX, (v) => isDraggingLoja = v));
+            popupLojaHeader.addEventListener("touchend", () => dragEnd((v) => isDraggingLoja = v, popupLoja));
+            popupLojaHeader.addEventListener("touchmove", (e) => drag(e, popupLoja, (x, y) => { lojaOffsetX = x; lojaOffsetY = y; }, isDraggingLoja));
+            popupLojaHeader.addEventListener("mousedown", (e) => dragStart(e, popupLoja, lojaOffsetX, (v) => isDraggingLoja = v));
+            popupLojaHeader.addEventListener("mouseup", () => dragEnd((v) => isDraggingLoja = v, popupLoja));
+            popupLojaHeader.addEventListener("mousemove", (e) => drag(e, popupLoja, (x, y) => { lojaOffsetX = x; lojaOffsetY = y; }, isDraggingLoja));
 
             botoesDificuldade.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const dificuldade = btn.dataset.dificuldade;
-                    dificuldadeAtual = dificuldade;
-                    
+                    dificuldadeAtual = btn.dataset.dificuldade;
                     botoesDificuldade.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
-                    regrasSpan.textContent = regrasDificuldade[dificuldade].texto;
+                    regrasSpan.textContent = regrasDificuldade[dificuldadeAtual].texto;
                 });
             });
 
             function atualizarDisplaySaldo() {
-                const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
-                popupSaldoJogo.textContent = valorFormatado;
-            }
-
-            function atualizarLojaSaldo() {
-                const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
-                lojaSaldo.textContent = valorFormatado;
+                const valor = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
+                popupSaldoJogo.textContent = valor;
+                lojaSaldo.textContent = valor;
             }
 
             function atualizarInventario() {
@@ -465,194 +381,91 @@
                 if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
                 if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
                 if (inventario.dado > 0) itens.push(`${inventario.dado}x 🎲 Dado (${inventario.dado * 10}% chance)`);
-                
-                if (itens.length === 0) {
-                    inventarioItens.innerHTML = '<span class="inventario-vazio">Nenhum item comprado</span>';
-                } else {
-                    inventarioItens.innerHTML = itens.map(item => `<span class="inventario-item">${item}</span>`).join('');
-                }
+                inventarioItens.innerHTML = itens.length ? itens.map(i => `<span class="inventario-item">${i}</span>`).join('') : '<span class="inventario-vazio">Nenhum item comprado</span>';
             }
 
             function comprarItem(item) {
                 const preco = precosItens[item];
-                
                 if (saldoJogo < preco) {
-                    vendedoraFala.textContent = '💰 Dinheiro insuficiente, querido!';
+                    vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
                     vendedoraFala.style.color = 'var(--cor-erro)';
-                    setTimeout(() => {
-                        vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!';
-                        vendedoraFala.style.color = 'var(--cor-primaria-1)';
-                    }, 2000);
+                    setTimeout(() => { vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
                     return;
                 }
-                
                 saldoJogo -= preco;
                 inventario[item]++;
-                
-                if (item === 'uva') {
-                    if (!simbolos.includes('🍇')) {
-                        simbolos.push('🍇');
-                    }
-                    vendedoraFala.textContent = '🍇 Uva adicionada! Ganhe com ela e faça chover dinheiro!';
-                } else if (item === 'pimenta') {
-                    if (!simbolos.includes('🌶️')) {
-                        simbolos.push('🌶️');
-                    }
-                    vendedoraFala.textContent = '🌶️ Pimenta comprada! Duas vitórias ativam o modo ARDENTE!';
-                } else if (item === 'dado') {
-                    vendedoraFala.textContent = `🎲 Chance de vitória aumentada para ${inventario.dado * 10}%!`;
-                }
-                
+                if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
+                if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
                 vendedoraFala.style.color = 'var(--cor-sucesso)';
-                setTimeout(() => {
-                    vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!';
-                    vendedoraFala.style.color = 'var(--cor-primaria-1)';
-                }, 3000);
-                
-                atualizarLojaSaldo();
+                vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar com ela!' : item === 'pimenta' ? '🌶️ Pimenta comprada! 2 vitórias = +700%!' : `🎲 Chance +${inventario.dado * 10}%!`;
+                setTimeout(() => { vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
                 atualizarDisplaySaldo();
                 atualizarInventario();
             }
 
             function abrirPopupLoja() {
+                if (popupSlots.style.display === 'block') popupSlots.style.display = 'none';
                 popupLoja.style.display = 'block';
                 popupLoja.style.transform = 'translate(-50%, -50%)';
-                lojaOffsetX = 0;
-                lojaOffsetY = 0;
-                atualizarLojaSaldo();
+                lojaOffsetX = lojaOffsetY = 0;
+                atualizarDisplaySaldo();
                 atualizarInventario();
             }
 
-            function girarSlot(slotElement) {
-                return new Promise(resolve => {
-                    let contador = 0;
-                    const maxGiros = 20;
-                    
-                    const intervalo = setInterval(() => {
-                        const simboloAleatorio = simbolos[Math.floor(Math.random() * simbolos.length)];
-                        slotElement.textContent = simboloAleatorio;
-                        contador++;
-                        
-                        if (contador >= maxGiros) {
-                            clearInterval(intervalo);
-                            resolve(slotElement.textContent);
-                        }
-                    }, 50);
+            function girarSlot(el) {
+                return new Promise(r => {
+                    let c = 0;
+                    const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 20) { clearInterval(i); r(el.textContent); } }, 50);
                 });
             }
 
             async function girarRoletas() {
-                if (girando) return;
-                if (saldoJogo <= 0) {
-                    slotsMensagemPopup.textContent = '💰 Você está quebrado! Recomece.';
-                    slotsMensagemPopup.style.color = 'var(--cor-erro)';
-                    return;
-                }
-                
-                girando = true;
-                btnGirarPopup.disabled = true;
-                slotsMensagemPopup.textContent = '🎲 Girando...';
-                slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                
-                const [resultado1, resultado2, resultado3] = await Promise.all([
-                    girarSlot(slot1),
-                    girarSlot(slot2),
-                    girarSlot(slot3)
-                ]);
-                
-                let ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
-                
-                let chanceBonus = inventario.dado * 0.1;
-                if (!ganhou && chanceBonus > 0 && Math.random() < chanceBonus) {
-                    ganhou = true;
-                    slotsMensagemPopup.textContent = '🎲 O Dado Viciado salvou você! 🎲';
-                }
-                
+                if (girando || saldoJogo <= 0) { if (saldoJogo <= 0) { slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.'; slotsMensagemPopup.style.color = 'var(--cor-erro)'; } return; }
+                girando = true; btnGirarPopup.disabled = true;
+                slotsMensagemPopup.textContent = '🎲 Girando...'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+                const [r1, r2, r3] = await Promise.all([girarSlot(slot1), girarSlot(slot2), girarSlot(slot3)]);
+                let ganhou = r1 === r2 && r2 === r3;
+                if (!ganhou && inventario.dado > 0 && Math.random() < inventario.dado * 0.1) { ganhou = true; slotsMensagemPopup.textContent = '🎲 Dado Viciado salvou!'; }
                 const regra = regrasDificuldade[dificuldadeAtual];
-                let multiplicador = 1;
-                
+                let mult = 1;
                 if (ganhou) {
                     inventario.vitoriasConsecutivas++;
-                    
-                    if (resultado1 === '🍇' && inventario.uva > 0) {
-                        multiplicador = 4.0;
-                        slotsMensagemPopup.textContent = '🍇 UVA DA SORTE! 400% DE BÔNUS! 🍇';
-                    }
-                    
+                    if (r1 === '🍇' && inventario.uva > 0) { mult = 4.0; slotsMensagemPopup.textContent = '🍇 UVA! 400%!'; }
                     if (inventario.pimenta > 0) {
-                        if (inventario.vitoriasConsecutivas >= 2) {
-                            inventario.pimentaAtiva = true;
-                        }
-                        
-                        if (inventario.pimentaAtiva) {
-                            multiplicador = 7.0;
-                            slotsMensagemPopup.textContent = '🌶️ PIMENTA ARDENTE! 700% DE BÔNUS! 🌶️';
-                            inventario.pimentaAtiva = false;
-                            inventario.vitoriasConsecutivas = 0;
-                        }
+                        if (inventario.vitoriasConsecutivas >= 2) inventario.pimentaAtiva = true;
+                        if (inventario.pimentaAtiva) { mult = 7.0; slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!'; inventario.pimentaAtiva = false; inventario.vitoriasConsecutivas = 0; }
                     }
-                    
-                    const ganho = saldoJogo * regra.ganho * multiplicador;
+                    const ganho = saldoJogo * regra.ganho * mult;
                     saldoJogo += ganho;
-                    
-                    if (multiplicador === 1) {
-                        slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
-                    } else {
-                        slotsMensagemPopup.textContent += ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
-                    }
+                    slotsMensagemPopup.textContent = mult === 1 ? `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!` : slotsMensagemPopup.textContent + ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
                 } else {
-                    inventario.vitoriasConsecutivas = 0;
-                    inventario.pimentaAtiva = false;
-                    
+                    inventario.vitoriasConsecutivas = 0; inventario.pimentaAtiva = false;
                     const perda = saldoJogo * regra.perda;
                     saldoJogo -= perda;
                     slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
                     slotsMensagemPopup.style.color = 'var(--cor-erro)';
                 }
-                
-                if (saldoJogo < 0.01) {
-                    saldoJogo = 0;
-                    slotsMensagemPopup.textContent = '🫵😂 PERDEU SEU POBRE, Recomeça o jogo.';
-                    slotsMensagemPopup.style.color = 'var(--cor-erro)';
-                }
-                
+                if (saldoJogo < 0.01) { saldoJogo = 0; slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.'; }
                 atualizarDisplaySaldo();
-                atualizarLojaSaldo();
-                girando = false;
-                btnGirarPopup.disabled = false;
+                girando = false; btnGirarPopup.disabled = false;
             }
 
             function resetarJogo() {
                 saldoJogo = 20.00;
-                slot1.textContent = '🍒';
-                slot2.textContent = '🍒';
-                slot3.textContent = '🍒';
-                slotsMensagemPopup.textContent = '✨ Boa sorte! ✨';
-                slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                
-                inventario = {
-                    uva: 0,
-                    pimenta: 0,
-                    dado: 0,
-                    vitoriasConsecutivas: 0,
-                    pimentaAtiva: false
-                };
-                
+                slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
+                slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+                inventario = { uva: 0, pimenta: 0, dado: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
                 simbolos = ['🍒', '💎', '7️⃣'];
-                
-                atualizarDisplaySaldo();
-                atualizarLojaSaldo();
-                atualizarInventario();
-                girando = false;
-                btnGirarPopup.disabled = false;
+                atualizarDisplaySaldo(); atualizarInventario();
+                girando = false; btnGirarPopup.disabled = false;
             }
 
             function abrirPopupSlots() {
+                if (popupLoja.style.display === 'block') popupLoja.style.display = 'none';
                 popupSlots.style.display = 'block';
                 popupSlots.style.transform = 'translate(-50%, -50%)';
-                xOffset = 0;
-                yOffset = 0;
+                xOffset = yOffset = 0;
                 atualizarDisplaySaldo();
             }
 
@@ -660,45 +473,15 @@
             popupFecharSlots.addEventListener('click', () => popupSlots.style.display = 'none');
             btnGirarPopup.addEventListener('click', girarRoletas);
             btnResetarJogoPopup.addEventListener('click', resetarJogo);
-
             btnLoja.addEventListener('click', abrirPopupLoja);
             popupFecharLoja.addEventListener('click', () => popupLoja.style.display = 'none');
+            document.querySelectorAll('.btn-comprar-item').forEach(b => b.addEventListener('click', () => comprarItem(b.dataset.item)));
 
-            document.querySelectorAll('.btn-comprar-item').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const item = btn.dataset.item;
-                    comprarItem(item);
-                });
-            });
-
-            modalFechar.addEventListener('click', () => {
-                modalImagem.style.display = 'none';
-                zoomAtual = 1;
-                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
-            });
-            
-            modalImagem.addEventListener('click', (e) => {
-                if (e.target === modalImagem) {
-                    modalImagem.style.display = 'none';
-                    zoomAtual = 1;
-                    modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
-                }
-            });
-
-            modalZoomIn.addEventListener('click', () => {
-                zoomAtual = Math.min(zoomAtual + 0.25, 3);
-                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
-            });
-
-            modalZoomOut.addEventListener('click', () => {
-                zoomAtual = Math.max(zoomAtual - 0.25, 0.5);
-                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
-            });
-
-            modalResetZoom.addEventListener('click', () => {
-                zoomAtual = 1;
-                modalImagemConteudo.style.transform = `scale(${zoomAtual})`;
-            });
+            modalFechar.addEventListener('click', () => { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
+            modalImagem.addEventListener('click', (e) => { if (e.target === modalImagem) { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; } });
+            modalZoomIn.addEventListener('click', () => { zoomAtual = Math.min(zoomAtual + 0.25, 3); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
+            modalZoomOut.addEventListener('click', () => { zoomAtual = Math.max(zoomAtual - 0.25, 0.5); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
+            modalResetZoom.addEventListener('click', () => { zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
 
             function comprimirImagem(file) {
                 return new Promise((resolve, reject) => {
@@ -707,27 +490,12 @@
                         const img = new Image();
                         img.onload = () => {
                             const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            
-                            const maxSize = 800;
-                            if (width > maxSize || height > maxSize) {
-                                if (width > height) {
-                                    height = (height / width) * maxSize;
-                                    width = maxSize;
-                                } else {
-                                    width = (width / height) * maxSize;
-                                    height = maxSize;
-                                }
-                            }
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                            resolve(base64);
+                            let w = img.width, h = img.height;
+                            const max = 800;
+                            if (w > max || h > max) { if (w > h) { h = (h / w) * max; w = max; } else { w = (w / h) * max; h = max; } }
+                            canvas.width = w; canvas.height = h;
+                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            resolve(canvas.toDataURL('image/jpeg', 0.7));
                         };
                         img.onerror = reject;
                         img.src = e.target.result;
@@ -737,413 +505,72 @@
                 });
             }
 
-            function abrirSeletorImagem(index) {
-                itemAtualParaImagem = index;
-                uploadImagemInput.click();
-            }
-
+            function abrirSeletorImagem(i) { itemAtualParaImagem = i; uploadImagemInput.click(); }
             uploadImagemInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file || itemAtualParaImagem === null) return;
-                
-                if (!file.type.startsWith('image/')) {
-                    alert('Por favor, selecione uma imagem.');
-                    return;
-                }
-                
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Imagem muito grande. Máximo 5MB.');
-                    return;
-                }
-                
+                const f = e.target.files[0];
+                if (!f || itemAtualParaImagem === null) return;
+                if (!f.type.startsWith('image/')) { alert('Selecione uma imagem.'); return; }
+                if (f.size > 5 * 1024 * 1024) { alert('Máximo 5MB.'); return; }
                 try {
                     loadingOverlay.style.display = 'flex';
-                    const imagemBase64 = await comprimirImagem(file);
-                    
-                    if (listaItens[itemAtualParaImagem]) {
-                        listaItens[itemAtualParaImagem].imagem = imagemBase64;
-                        salvarLista();
-                        renderizarLista();
-                    }
-                } catch (error) {
-                    console.error('Erro ao processar imagem:', error);
-                    alert('Erro ao processar a imagem.');
-                } finally {
-                    loadingOverlay.style.display = 'none';
-                    uploadImagemInput.value = '';
-                    itemAtualParaImagem = null;
-                }
+                    const b64 = await comprimirImagem(f);
+                    if (listaItens[itemAtualParaImagem]) { listaItens[itemAtualParaImagem].imagem = b64; salvarLista(); renderizarLista(); }
+                } catch (er) { alert('Erro ao processar.'); }
+                finally { loadingOverlay.style.display = 'none'; uploadImagemInput.value = ''; itemAtualParaImagem = null; }
             });
 
-            function removerImagem(index) {
-                if (listaItens[index]) {
-                    delete listaItens[index].imagem;
-                    salvarLista();
-                    renderizarLista();
-                }
-            }
+            function removerImagem(i) { if (listaItens[i]) { delete listaItens[i].imagem; salvarLista(); renderizarLista(); } }
 
-            function moveFinaland() {
-                if (!easterEggAtivo) return;
-                
-                xPosition += speed * xDirection;
-                yPosition += speed * yDirection;
-
-                if (xPosition >= window.innerWidth - flyingFinaland.width || xPosition <= 0) {
-                    xDirection *= -1;
-                }
-                if (yPosition >= window.innerHeight - flyingFinaland.height || yPosition <= 0) {
-                    yDirection *= -1;
-                }
-
-                flyingFinaland.style.left = xPosition + 'px';
-                flyingFinaland.style.top = yPosition + 'px';
-            }
-
+            function moveFinaland() { if (!easterEggAtivo) return; xPosition += speed * xDirection; yPosition += speed * yDirection; if (xPosition >= innerWidth - 50 || xPosition <= 0) xDirection *= -1; if (yPosition >= innerHeight - 50 || yPosition <= 0) yDirection *= -1; flyingFinaland.style.left = xPosition + 'px'; flyingFinaland.style.top = yPosition + 'px'; }
             setInterval(moveFinaland, 50);
 
-            function shakeScreen() {
-                const container = document.querySelector('.app-container');
-                container.style.transition = 'transform 0.05s';
-                
-                let shakes = 0;
-                const maxShakes = 10;
-                
-                const shakeInterval = setInterval(() => {
-                    const x = (Math.random() - 0.5) * 10;
-                    const y = (Math.random() - 0.5) * 10;
-                    container.style.transform = `translate(${x}px, ${y}px)`;
-                    
-                    shakes++;
-                    if (shakes >= maxShakes) {
-                        clearInterval(shakeInterval);
-                        container.style.transform = 'translate(0, 0)';
-                        container.style.transition = 'transform 0.3s';
-                    }
-                }, 50);
-            }
+            function shakeScreen() { const c = document.querySelector('.app-container'); c.style.transition = 'transform 0.05s'; let s = 0; const i = setInterval(() => { c.style.transform = `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)`; if (++s >= 10) { clearInterval(i); c.style.transform = ''; c.style.transition = ''; } }, 50); }
 
-            function atualizarEstadoVazio() {
-                if (listaItens.length === 0) {
-                    estadoVazio.style.display = 'flex';
-                    listaElement.style.display = 'none';
-                    btnLimparComprados.style.display = 'none';
-                } else {
-                    estadoVazio.style.display = 'none';
-                    listaElement.style.display = 'block';
-                    
-                    const temComprados = listaItens.some(item => item.comprado);
-                    btnLimparComprados.style.display = temComprados ? 'block' : 'none';
-                }
-            }
+            function atualizarEstadoVazio() { if (listaItens.length === 0) { estadoVazio.style.display = 'flex'; listaElement.style.display = 'none'; btnLimparComprados.style.display = 'none'; } else { estadoVazio.style.display = 'none'; listaElement.style.display = 'block'; btnLimparComprados.style.display = listaItens.some(i => i.comprado) ? 'block' : 'none'; } }
 
-            function salvarLista() {
-                localStorage.setItem('listaCompras', JSON.stringify(listaItens));
-                avisoVisual.style.opacity = '1';
-                avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)';
-                avisoVisual.style.borderLeftColor = '#ffffff';
-                avisoVisual.style.color = '#ffffff';
-                avisoVisual.querySelector('span').textContent = 'Lista salva com sucesso!';
-                
-                setTimeout(() => {
-                    avisoVisual.style.opacity = '0.6';
-                    avisoVisual.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-                    avisoVisual.style.borderLeftColor = '#ffffff';
-                    avisoVisual.style.color = '#ffffff';
-                    avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos. Continue digitando.';
-                }, 2000);
-            }
+            function salvarLista() { localStorage.setItem('listaCompras', JSON.stringify(listaItens)); avisoVisual.style.opacity = '1'; avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)'; avisoVisual.style.borderLeftColor = '#fff'; avisoVisual.style.color = '#fff'; avisoVisual.querySelector('span').textContent = 'Lista salva!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.'; }, 2000); }
 
-            function carregarLista() {
-                const saved = localStorage.getItem('listaCompras');
-                if (saved) {
-                    try {
-                        listaItens = JSON.parse(saved);
-                    } catch (e) {
-                        listaItens = [];
-                    }
-                } else {
-                    listaItens = [];
-                }
-                
-                renderizarLista();
-                
-                setTimeout(() => {
-                    if (listaItens.length > 0 && listaElement.children.length === 0) {
-                        renderizarLista();
-                    }
-                }, 100);
-            }
+            function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 100); }
 
             function renderizarLista() {
                 listaElement.innerHTML = '';
-                
-                if (listaItens.length === 0) {
-                    atualizarEstadoVazio();
-                    return;
-                }
-                
-                listaItens.forEach((item, index) => {
-                    const li = document.createElement('li');
-                    li.className = `item-lista ${item.comprado ? 'comprado' : ''}`;
-                    
-                    let imagemHtml = '';
-                    if (item.imagem) {
-                        imagemHtml = `
-                            <div class="item-imagem-container">
-                                <img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')">
-                                <button class="btn-remover-imagem" data-index="${index}" title="Remover imagem">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        `;
-                    }
-                    
-                    li.innerHTML = `
-                        <div class="item-principal">
-                            <div class="item-conteudo">
-                                <input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${index}">
-                                ${imagemHtml}
-                                <span class="item-nome">${item.nome}</span>
-                                <span class="item-quantidade">${item.quantidade || 1}x</span>
-                            </div>
-                            <div class="item-acoes">
-                                <button class="btn-icon-small btn-imagem" data-index="${index}" title="Adicionar imagem">
-                                    <i class="fas fa-camera"></i>
-                                </button>
-                                <button class="btn-icon-small btn-diminuir" data-index="${index}" title="Diminuir quantidade">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button class="btn-icon-small btn-aumentar" data-index="${index}" title="Aumentar quantidade">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button class="btn-icon-small btn-remover" data-index="${index}" title="Remover item">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
+                if (!listaItens.length) { atualizarEstadoVazio(); return; }
+                listaItens.forEach((item, i) => {
+                    const li = document.createElement('li'); li.className = `item-lista ${item.comprado ? 'comprado' : ''}`;
+                    li.innerHTML = `<div class="item-principal"><div class="item-conteudo"><input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${i}">${item.imagem ? `<div class="item-imagem-container"><img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')"><button class="btn-remover-imagem" data-index="${i}"><i class="fas fa-times"></i></button></div>` : ''}<span class="item-nome">${item.nome}</span><span class="item-quantidade">${item.quantidade || 1}x</span></div><div class="item-acoes"><button class="btn-icon-small btn-imagem" data-index="${i}"><i class="fas fa-camera"></i></button><button class="btn-icon-small btn-diminuir" data-index="${i}"><i class="fas fa-minus"></i></button><button class="btn-icon-small btn-aumentar" data-index="${i}"><i class="fas fa-plus"></i></button><button class="btn-icon-small btn-remover" data-index="${i}"><i class="fas fa-trash-alt"></i></button></div></div>`;
                     listaElement.appendChild(li);
                 });
-                
-                document.querySelectorAll('.item-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        const index = parseInt(this.dataset.index);
-                        if (listaItens[index]) {
-                            listaItens[index].comprado = this.checked;
-                            salvarLista();
-                            renderizarLista();
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.btn-diminuir').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        if (listaItens[index] && listaItens[index].quantidade > 1) {
-                            listaItens[index].quantidade--;
-                            salvarLista();
-                            renderizarLista();
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.btn-aumentar').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        if (listaItens[index]) {
-                            listaItens[index].quantidade = (listaItens[index].quantidade || 1) + 1;
-                            salvarLista();
-                            renderizarLista();
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.btn-remover').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        if (listaItens[index]) {
-                            listaItens.splice(index, 1);
-                            salvarLista();
-                            renderizarLista();
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.btn-imagem').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.dataset.index);
-                        abrirSeletorImagem(index);
-                    });
-                });
-                
-                document.querySelectorAll('.btn-remover-imagem').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const index = parseInt(this.dataset.index);
-                        removerImagem(index);
-                    });
-                });
-                
+                document.querySelectorAll('.item-checkbox').forEach(cb => cb.addEventListener('change', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].comprado = this.checked; salvarLista(); renderizarLista(); } }));
+                document.querySelectorAll('.btn-diminuir').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i] && listaItens[i].quantidade > 1) { listaItens[i].quantidade--; salvarLista(); renderizarLista(); } }));
+                document.querySelectorAll('.btn-aumentar').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].quantidade = (listaItens[i].quantidade || 1) + 1; salvarLista(); renderizarLista(); } }));
+                document.querySelectorAll('.btn-remover').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens.splice(i, 1); salvarLista(); renderizarLista(); } }));
+                document.querySelectorAll('.btn-imagem').forEach(b => b.addEventListener('click', function() { abrirSeletorImagem(+this.dataset.index); }));
+                document.querySelectorAll('.btn-remover-imagem').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); removerImagem(+this.dataset.index); }));
                 atualizarEstadoVazio();
             }
 
-            function adicionarItem() {
-                const nome = inputItem.value.trim();
-                if (nome) {
-                    listaItens.push({
-                        nome: nome,
-                        quantidade: 1,
-                        comprado: false
-                    });
-                    salvarLista();
-                    renderizarLista();
-                    inputItem.value = '';
-                    inputItem.focus();
-                }
-            }
-
-            function limparComprados() {
-                listaItens = listaItens.filter(item => !item.comprado);
-                salvarLista();
-                renderizarLista();
-            }
-
-            function logout() {
-                if (typeof window.logout === 'function') {
-                    window.logout();
-                } else {
-                    window.location.href = 'login.html';
-                }
-            }
+            function adicionarItem() { const n = inputItem.value.trim(); if (n) { listaItens.push({ nome: n, quantidade: 1, comprado: false }); salvarLista(); renderizarLista(); inputItem.value = ''; inputItem.focus(); } }
+            function limparComprados() { listaItens = listaItens.filter(i => !i.comprado); salvarLista(); renderizarLista(); }
+            function logout() { window.logout ? window.logout() : location.href = 'login.html'; }
 
             btnAdicionar.addEventListener('click', adicionarItem);
-            
-            inputItem.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adicionarItem();
-                }
-            });
-            
-            inputItem.addEventListener('focus', function() {
-                if (listaItens.length > 0 && listaElement.children.length === 0) {
-                    renderizarLista();
-                    avisoVisual.style.opacity = '1';
-                    avisoVisual.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-                    avisoVisual.style.borderLeftColor = '#ffffff';
-                    avisoVisual.style.color = '#ffffff';
-                    avisoVisual.querySelector('span').textContent = 'Lista restaurada! Continue editando.';
-                    setTimeout(() => {
-                        avisoVisual.style.opacity = '0.6';
-                        avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos. Continue digitando.';
-                    }, 2000);
-                }
-            });
-
+            inputItem.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(); });
+            inputItem.addEventListener('focus', () => { if (listaItens.length && !listaElement.children.length) { renderizarLista(); avisoVisual.style.opacity = '1'; avisoVisual.querySelector('span').textContent = 'Lista restaurada!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual.'; }, 2000); } });
             btnLimparComprados.addEventListener('click', limparComprados);
             btnLogout.addEventListener('click', logout);
+            window.addEventListener('online', () => { modoOffline = false; statusConexao.className = 'status-indicator online'; statusConexao.title = 'Online'; loadingOverlay.style.display = 'none'; });
+            window.addEventListener('offline', () => { modoOffline = true; statusConexao.className = 'status-indicator offline'; statusConexao.title = 'Offline'; });
 
-            window.addEventListener('online', function() {
-                modoOffline = false;
-                statusConexao.className = 'status-indicator online';
-                statusConexao.title = 'Online';
-                loadingOverlay.style.display = 'none';
-            });
+            let konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], kIdx = 0;
+            document.addEventListener('keydown', (e) => { if (e.key === konami[kIdx]) { kIdx++; if (kIdx === konami.length) { ativarEasterEgg(); kIdx = 0; } } else kIdx = 0; });
 
-            window.addEventListener('offline', function() {
-                modoOffline = true;
-                statusConexao.className = 'status-indicator offline';
-                statusConexao.title = 'Offline';
-            });
-
-            let konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-            let konamiIndex = 0;
-
-            document.addEventListener('keydown', function(e) {
-                const key = e.key;
-                
-                if (key === konamiCode[konamiIndex]) {
-                    konamiIndex++;
-                    
-                    if (konamiIndex === konamiCode.length) {
-                        ativarEasterEgg();
-                        konamiIndex = 0;
-                    }
-                } else {
-                    konamiIndex = 0;
-                }
-            });
-
-            function ativarEasterEgg() {
-                if (easterEggAtivo) return;
-                
-                easterEggAtivo = true;
-                
-                const bgDiv = document.createElement('div');
-                bgDiv.id = 'easter-egg-bg';
-                bgDiv.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-image: url('blackman.jpg');
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    background-size: contain;
-                    opacity: 0;
-                    pointer-events: none;
-                    z-index: 9998;
-                    transition: opacity 2s ease, transform 0.3s ease;
-                `;
-                document.body.appendChild(bgDiv);
-                
-                setTimeout(() => {
-                    bgDiv.style.opacity = '0.1';
-                    flyingFinaland.style.opacity = '1';
-                }, 50);
-                
-                if (jumpscareTimeout) clearTimeout(jumpscareTimeout);
-                
-                jumpscareTimeout = setTimeout(() => {
-                    bgDiv.style.transition = 'opacity 0.1s, transform 0.2s';
-                    bgDiv.style.opacity = '1';
-                    bgDiv.style.transform = 'scale(1.3)';
-                    
-                    shakeScreen();
-                    
-                    setTimeout(() => {
-                        bgDiv.style.transition = 'opacity 1s, transform 0.3s';
-                        bgDiv.style.opacity = '0.1';
-                        bgDiv.style.transform = 'scale(1)';
-                    }, 300);
-                }, 3000);
-                
-                const velocidadeOriginal = speed;
-                speed = 18;
-                
-                if (easterEggTimeout) clearTimeout(easterEggTimeout);
-                
-                easterEggTimeout = setTimeout(() => {
-                    bgDiv.style.opacity = '0';
-                    speed = velocidadeOriginal;
-                    flyingFinaland.style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        bgDiv.remove();
-                        easterEggAtivo = false;
-                    }, 2000);
-                }, 15000);
-            }
+            function ativarEasterEgg() { if (easterEggAtivo) return; easterEggAtivo = true; const bg = document.createElement('div'); bg.id = 'easter-egg-bg'; bg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-image:url(blackman.jpg);background-position:center;background-repeat:no-repeat;background-size:contain;opacity:0;pointer-events:none;z-index:9998;transition:opacity 2s,transform 0.3s;'; document.body.appendChild(bg); setTimeout(() => { bg.style.opacity = '0.1'; flyingFinaland.style.opacity = '1'; }, 50); jumpscareTimeout = setTimeout(() => { bg.style.transition = 'opacity 0.1s, transform 0.2s'; bg.style.opacity = '1'; bg.style.transform = 'scale(1.3)'; shakeScreen(); setTimeout(() => { bg.style.transition = 'opacity 1s, transform 0.3s'; bg.style.opacity = '0.1'; bg.style.transform = 'scale(1)'; }, 300); }, 3000); const spd = speed; speed = 18; easterEggTimeout = setTimeout(() => { bg.style.opacity = '0'; speed = spd; flyingFinaland.style.opacity = '0'; setTimeout(() => { bg.remove(); easterEggAtivo = false; }, 2000); }, 15000); }
 
             carregarLista();
             atualizarDisplaySaldo();
-            atualizarLojaSaldo();
             atualizarInventario();
         });
     </script>
-    
     <script type="module" src="app.js"></script>
 </body>
 </html>
