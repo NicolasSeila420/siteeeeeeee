@@ -76,6 +76,11 @@
         <button id="btnJogoSlots" class="btn-jogo-slots" aria-label="Jogo de Slots">
             <i class="fas fa-dice"></i>
         </button>
+        
+        <button id="btnLoja" class="btn-loja" aria-label="Loja">
+            <img src="iconvendedoragostosamodoclaro.png" alt="Loja" class="loja-icon claro">
+            <img src="iconvendedoragostosamodoescuro.png" alt="Loja" class="loja-icon escuro">
+        </button>
     </div>
 
     <div id="modalImagem" class="modal-imagem" style="display: none;">
@@ -141,6 +146,63 @@
                 <i class="fas fa-undo-alt"></i>
                 Recomeçar
             </button>
+        </div>
+    </div>
+
+    <div id="popupLoja" class="popup-loja" style="display: none;">
+        <div class="popup-loja-header" id="popupLojaHeader">
+            <h3 class="popup-loja-titulo">
+                <i class="fas fa-store"></i>
+                Loja da Sorte
+            </h3>
+            <div class="popup-loja-acoes">
+                <span class="loja-saldo" id="lojaSaldo">R$ 20,00</span>
+                <button id="popupFecharLoja" class="popup-fechar" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="popup-loja-body">
+            <div class="vendedora-container">
+                <img src="vendedoragostosa.png" alt="Vendedora" class="vendedora-img" id="vendedoraImg">
+                <div class="vendedora-fala" id="vendedoraFala">
+                    Bem-vindo! Veja meus itens!
+                </div>
+            </div>
+            
+            <div class="itens-grid" id="itensGrid">
+                <div class="item-loja" data-item="uva">
+                    <div class="item-icone">🍇</div>
+                    <div class="item-nome-loja">Uva da Sorte</div>
+                    <div class="item-preco">R$ 150,00</div>
+                    <div class="item-descricao">Adiciona Uva aos slots. Ganhar com Uva = +400%</div>
+                    <button class="btn-comprar-item" data-item="uva">Comprar</button>
+                </div>
+                
+                <div class="item-loja" data-item="pimenta">
+                    <div class="item-icone">🌶️</div>
+                    <div class="item-nome-loja">Pimenta Ardente</div>
+                    <div class="item-preco">R$ 270,00</div>
+                    <div class="item-descricao">Adiciona Pimenta. 2 vitórias = próxima vitória +700%</div>
+                    <button class="btn-comprar-item" data-item="pimenta">Comprar</button>
+                </div>
+                
+                <div class="item-loja" data-item="dado">
+                    <div class="item-icone">🎲</div>
+                    <div class="item-nome-loja">Dado Viciado</div>
+                    <div class="item-preco">R$ 50,00</div>
+                    <div class="item-descricao">+10% de chance de vitória (acumulativo)</div>
+                    <button class="btn-comprar-item" data-item="dado">Comprar</button>
+                </div>
+            </div>
+            
+            <div class="inventario-container">
+                <h4>Seus Itens</h4>
+                <div class="inventario-itens" id="inventarioItens">
+                    <span class="inventario-vazio">Nenhum item comprado</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -217,6 +279,14 @@
             const regrasSpan = document.getElementById('regrasDificuldade');
             const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
             
+            const btnLoja = document.getElementById('btnLoja');
+            const popupLoja = document.getElementById('popupLoja');
+            const popupFecharLoja = document.getElementById('popupFecharLoja');
+            const popupLojaHeader = document.getElementById('popupLojaHeader');
+            const lojaSaldo = document.getElementById('lojaSaldo');
+            const vendedoraFala = document.getElementById('vendedoraFala');
+            const inventarioItens = document.getElementById('inventarioItens');
+            
             const flyingFinaland = document.getElementById('flying-finaland');
             let xDirection = 1;
             let yDirection = 1;
@@ -234,20 +304,32 @@
             let saldoJogo = 20.00;
             let girando = false;
             let dificuldadeAtual = 'facil';
-            const simbolos = ['🍒', '💎', '7️⃣'];
+            let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
                 facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
                 medio: { perda: 0.4, ganho: 1.0, texto: 'Perde 40% | Ganha 100%' },
                 dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
             };
             
+            let inventario = {
+                uva: 0,
+                pimenta: 0,
+                dado: 0,
+                vitoriasConsecutivas: 0,
+                pimentaAtiva: false
+            };
+            
+            const precosItens = {
+                uva: 150,
+                pimenta: 270,
+                dado: 50
+            };
+            
             let isDragging = false;
-            let currentX;
-            let currentY;
-            let initialX;
-            let initialY;
-            let xOffset = 0;
-            let yOffset = 0;
+            let isDraggingLoja = false;
+            let currentX, currentY, initialX, initialY;
+            let xOffset = 0, yOffset = 0;
+            let lojaOffsetX = 0, lojaOffsetY = 0;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -301,12 +383,60 @@
                 el.style.transform = `translate(calc(-50% + ${xPos}px), calc(-50% + ${yPos}px))`;
             }
 
+            function dragStartLoja(e) {
+                if (e.target.closest('button')) return;
+                
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - lojaOffsetX;
+                    initialY = e.touches[0].clientY - lojaOffsetY;
+                } else {
+                    initialX = e.clientX - lojaOffsetX;
+                    initialY = e.clientY - lojaOffsetY;
+                }
+                
+                isDraggingLoja = true;
+                popupLoja.style.cursor = 'grabbing';
+            }
+
+            function dragEndLoja(e) {
+                initialX = currentX;
+                initialY = currentY;
+                isDraggingLoja = false;
+                popupLoja.style.cursor = 'default';
+            }
+
+            function dragLoja(e) {
+                if (isDraggingLoja) {
+                    e.preventDefault();
+                    
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+                    
+                    lojaOffsetX = currentX;
+                    lojaOffsetY = currentY;
+                    
+                    popupLoja.style.transform = `translate(calc(-50% + ${lojaOffsetX}px), calc(-50% + ${lojaOffsetY}px))`;
+                }
+            }
+
             popupSlotsHeader.addEventListener("touchstart", dragStart, false);
             popupSlotsHeader.addEventListener("touchend", dragEnd, false);
             popupSlotsHeader.addEventListener("touchmove", drag, false);
             popupSlotsHeader.addEventListener("mousedown", dragStart, false);
             popupSlotsHeader.addEventListener("mouseup", dragEnd, false);
             popupSlotsHeader.addEventListener("mousemove", drag, false);
+
+            popupLojaHeader.addEventListener("touchstart", dragStartLoja, false);
+            popupLojaHeader.addEventListener("touchend", dragEndLoja, false);
+            popupLojaHeader.addEventListener("touchmove", dragLoja, false);
+            popupLojaHeader.addEventListener("mousedown", dragStartLoja, false);
+            popupLojaHeader.addEventListener("mouseup", dragEndLoja, false);
+            popupLojaHeader.addEventListener("mousemove", dragLoja, false);
 
             botoesDificuldade.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -323,6 +453,74 @@
             function atualizarDisplaySaldo() {
                 const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
                 popupSaldoJogo.textContent = valorFormatado;
+            }
+
+            function atualizarLojaSaldo() {
+                const valorFormatado = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
+                lojaSaldo.textContent = valorFormatado;
+            }
+
+            function atualizarInventario() {
+                const itens = [];
+                if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
+                if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
+                if (inventario.dado > 0) itens.push(`${inventario.dado}x 🎲 Dado (${inventario.dado * 10}% chance)`);
+                
+                if (itens.length === 0) {
+                    inventarioItens.innerHTML = '<span class="inventario-vazio">Nenhum item comprado</span>';
+                } else {
+                    inventarioItens.innerHTML = itens.map(item => `<span class="inventario-item">${item}</span>`).join('');
+                }
+            }
+
+            function comprarItem(item) {
+                const preco = precosItens[item];
+                
+                if (saldoJogo < preco) {
+                    vendedoraFala.textContent = '💰 Dinheiro insuficiente, querido!';
+                    vendedoraFala.style.color = 'var(--cor-erro)';
+                    setTimeout(() => {
+                        vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!';
+                        vendedoraFala.style.color = 'var(--cor-primaria-1)';
+                    }, 2000);
+                    return;
+                }
+                
+                saldoJogo -= preco;
+                inventario[item]++;
+                
+                if (item === 'uva') {
+                    if (!simbolos.includes('🍇')) {
+                        simbolos.push('🍇');
+                    }
+                    vendedoraFala.textContent = '🍇 Uva adicionada! Ganhe com ela e faça chover dinheiro!';
+                } else if (item === 'pimenta') {
+                    if (!simbolos.includes('🌶️')) {
+                        simbolos.push('🌶️');
+                    }
+                    vendedoraFala.textContent = '🌶️ Pimenta comprada! Duas vitórias ativam o modo ARDENTE!';
+                } else if (item === 'dado') {
+                    vendedoraFala.textContent = `🎲 Chance de vitória aumentada para ${inventario.dado * 10}%!`;
+                }
+                
+                vendedoraFala.style.color = 'var(--cor-sucesso)';
+                setTimeout(() => {
+                    vendedoraFala.textContent = 'Bem-vindo! Veja meus itens!';
+                    vendedoraFala.style.color = 'var(--cor-primaria-1)';
+                }, 3000);
+                
+                atualizarLojaSaldo();
+                atualizarDisplaySaldo();
+                atualizarInventario();
+            }
+
+            function abrirPopupLoja() {
+                popupLoja.style.display = 'block';
+                popupLoja.style.transform = 'translate(-50%, -50%)';
+                lojaOffsetX = 0;
+                lojaOffsetY = 0;
+                atualizarLojaSaldo();
+                atualizarInventario();
             }
 
             function girarSlot(slotElement) {
@@ -362,15 +560,51 @@
                     girarSlot(slot3)
                 ]);
                 
-                const ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
+                let ganhou = (resultado1 === resultado2 && resultado2 === resultado3);
+                
+                let chanceBonus = inventario.dado * 0.1;
+                if (!ganhou && chanceBonus > 0 && Math.random() < chanceBonus) {
+                    ganhou = true;
+                    slotsMensagemPopup.textContent = '🎲 O Dado Viciado salvou você! 🎲';
+                }
+                
                 const regra = regrasDificuldade[dificuldadeAtual];
+                let multiplicador = 1;
                 
                 if (ganhou) {
-                    const ganho = saldoJogo * regra.ganho;
+                    inventario.vitoriasConsecutivas++;
+                    
+                    if (resultado1 === '🍇' && inventario.uva > 0) {
+                        multiplicador = 4.0;
+                        slotsMensagemPopup.textContent = '🍇 UVA DA SORTE! 400% DE BÔNUS! 🍇';
+                    }
+                    
+                    if (inventario.pimenta > 0) {
+                        if (inventario.vitoriasConsecutivas >= 2) {
+                            inventario.pimentaAtiva = true;
+                        }
+                        
+                        if (inventario.pimentaAtiva) {
+                            multiplicador = 7.0;
+                            slotsMensagemPopup.textContent = '🌶️ PIMENTA ARDENTE! 700% DE BÔNUS! 🌶️';
+                            inventario.pimentaAtiva = false;
+                            inventario.vitoriasConsecutivas = 0;
+                        }
+                    }
+                    
+                    const ganho = saldoJogo * regra.ganho * multiplicador;
                     saldoJogo += ganho;
-                    slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
+                    
+                    if (multiplicador === 1) {
+                        slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}! 🎉`;
+                    } else {
+                        slotsMensagemPopup.textContent += ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+                    }
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
                 } else {
+                    inventario.vitoriasConsecutivas = 0;
+                    inventario.pimentaAtiva = false;
+                    
                     const perda = saldoJogo * regra.perda;
                     saldoJogo -= perda;
                     slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
@@ -384,6 +618,7 @@
                 }
                 
                 atualizarDisplaySaldo();
+                atualizarLojaSaldo();
                 girando = false;
                 btnGirarPopup.disabled = false;
             }
@@ -395,7 +630,20 @@
                 slot3.textContent = '🍒';
                 slotsMensagemPopup.textContent = '✨ Boa sorte! ✨';
                 slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+                
+                inventario = {
+                    uva: 0,
+                    pimenta: 0,
+                    dado: 0,
+                    vitoriasConsecutivas: 0,
+                    pimentaAtiva: false
+                };
+                
+                simbolos = ['🍒', '💎', '7️⃣'];
+                
                 atualizarDisplaySaldo();
+                atualizarLojaSaldo();
+                atualizarInventario();
                 girando = false;
                 btnGirarPopup.disabled = false;
             }
@@ -409,13 +657,19 @@
             }
 
             btnJogoSlots.addEventListener('click', abrirPopupSlots);
-            
-            popupFecharSlots.addEventListener('click', () => {
-                popupSlots.style.display = 'none';
-            });
-            
+            popupFecharSlots.addEventListener('click', () => popupSlots.style.display = 'none');
             btnGirarPopup.addEventListener('click', girarRoletas);
             btnResetarJogoPopup.addEventListener('click', resetarJogo);
+
+            btnLoja.addEventListener('click', abrirPopupLoja);
+            popupFecharLoja.addEventListener('click', () => popupLoja.style.display = 'none');
+
+            document.querySelectorAll('.btn-comprar-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = btn.dataset.item;
+                    comprarItem(item);
+                });
+            });
 
             modalFechar.addEventListener('click', () => {
                 modalImagem.style.display = 'none';
@@ -885,6 +1139,8 @@
 
             carregarLista();
             atualizarDisplaySaldo();
+            atualizarLojaSaldo();
+            atualizarInventario();
         });
     </script>
     

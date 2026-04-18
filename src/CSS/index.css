@@ -1098,4 +1098,304 @@ body {
         height: 70px;
         font-size: 2rem;
     }
+    .btn-loja {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--container-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 8px;
+}
+
+.btn-loja:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.loja-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.loja-icon.escuro {
+    display: none;
+}
+
+[data-theme="dark"] .loja-icon.claro {
+    display: none;
+}
+
+[data-theme="dark"] .loja-icon.escuro {
+    display: block;
+}
+
+.popup-loja {
+    display: none;
+    position: fixed;
+    z-index: 10003;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    max-width: 90vw;
+    max-height: 85vh;
+    background: var(--container-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-color);
+    overflow: hidden;
+    user-select: none;
+    overflow-y: auto;
+}
+
+.popup-loja-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-color);
+    cursor: grab;
+}
+
+.popup-loja-header:active {
+    cursor: grabbing;
+}
+
+.popup-loja-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    color: var(--cor-primaria-1);
+    margin: 0;
+}
+
+.popup-loja-titulo i {
+    color: #f39c12;
+}
+
+.popup-loja-acoes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.loja-saldo {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-loja-body {
+    padding: 24px 20px;
+}
+
+.vendedora-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.vendedora-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #f39c12;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 12px;
+}
+
+.vendedora-fala {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    color: var(--cor-primaria-1);
+    text-align: center;
+    max-width: 80%;
+    transition: color 0.3s ease;
+}
+
+.itens-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.item-loja {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+}
+
+.item-loja:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: #f39c12;
+    transform: translateY(-2px);
+}
+
+.item-loja:hover .item-descricao {
+    opacity: 1;
+    visibility: visible;
+}
+
+.item-icone {
+    font-size: 2rem;
+    margin-bottom: 4px;
+}
+
+.item-nome-loja {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--cor-primaria-1);
+    margin-bottom: 4px;
+}
+
+.item-preco {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #f39c12;
+    margin-bottom: 8px;
+}
+
+.item-descricao {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--container-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+    color: var(--cor-primaria-1);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 10;
+    margin-bottom: 8px;
+}
+
+.btn-comprar-item {
+    width: 100%;
+    padding: 6px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    border: none;
+    border-radius: 20px;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-comprar-item:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    transform: scale(1.05);
+}
+
+.inventario-container {
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+}
+
+.inventario-container h4 {
+    font-size: 0.9rem;
+    color: var(--cor-primaria-1);
+    margin-bottom: 8px;
+}
+
+.inventario-itens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.inventario-item {
+    background: rgba(243, 156, 18, 0.15);
+    border: 1px solid #f39c12;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    color: var(--cor-primaria-1);
+}
+
+.inventario-vazio {
+    color: var(--cor-primaria-3);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+@media (max-width: 480px) {
+    .popup-loja {
+        width: 100%;
+        max-height: 80vh;
+    }
+    
+    .itens-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .item-loja {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 8px 12px;
+    }
+    
+    .item-icone {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+    
+    .item-nome-loja {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+    
+    .item-preco {
+        margin-bottom: 0;
+    }
+    
+    .btn-comprar-item {
+        width: auto;
+        padding: 6px 12px;
+    }
+    
+    .item-descricao {
+        white-space: normal;
+        width: 200px;
+    }
+}
 }
