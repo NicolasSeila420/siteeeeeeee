@@ -1190,4 +1190,35 @@ body {
     .item-descricao { white-space: normal; width: 180px; }
     .vendedora-img { width: 140px; height: 140px; }
     .btn-loja-no-slot { width: 28px; height: 28px; }
+
+    .btn-loja-popup {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    border: none;
+    border-radius: 50px;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 0 #6c3483, 0 8px 20px rgba(0, 0, 0, 0.2);
+    margin-top: 8px;
+    border: 2px solid #d2b4de;
+}
+
+.btn-loja-popup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #6c3483, 0 12px 24px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.btn-loja-popup:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #6c3483, 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 }

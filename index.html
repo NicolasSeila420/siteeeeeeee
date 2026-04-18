@@ -101,14 +101,11 @@
                 Slots da Sorte
             </h3>
             <div class="popup-slots-acoes">
-                <button id="btnLojaNoSlot" class="btn-loja-no-slot" aria-label="Loja">
-                    <img src="iconvendedoragostosamodoclaro.png" alt="Loja" id="lojaIconSlot">
-                </button>
-                <span class="popup-saldo" id="popupSaldoJogo">R$ 20,00</span>
-                <button id="popupFecharSlots" class="popup-fechar" aria-label="Fechar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <span class="popup-saldo" id="popupSaldoJogo">R$ 20,00</span>
+            <button id="popupFecharSlots" class="popup-fechar" aria-label="Fechar">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
         </div>
         
         <div class="popup-slots-body">
@@ -144,6 +141,10 @@
                 <i class="fas fa-undo-alt"></i>
                 Recomeçar
             </button>
+            <button id="btnLojaPopup" class="btn-loja-popup">
+            <i class="fas fa-store"></i>
+            LOJA
+    </button>
         </div>
     </div>
 
@@ -249,328 +250,328 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const btnLogout = document.getElementById('btnLogout');
-            const btnAdicionar = document.getElementById('btnAdicionar');
-            const inputItem = document.getElementById('item');
-            const listaElement = document.getElementById('lista');
-            const estadoVazio = document.getElementById('estadoVazio');
-            const btnLimparComprados = document.getElementById('btnLimparComprados');
-            const statusConexao = document.getElementById('statusConexao');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const avisoVisual = document.getElementById('avisoVisual');
-            const uploadImagemInput = document.getElementById('uploadImagemInput');
-            const modalImagem = document.getElementById('modalImagem');
-            const modalImagemConteudo = document.getElementById('modalImagemConteudo');
-            const modalFechar = document.querySelector('.modal-fechar');
-            const modalZoomIn = document.getElementById('modalZoomIn');
-            const modalZoomOut = document.getElementById('modalZoomOut');
-            const modalResetZoom = document.getElementById('modalResetZoom');
-            
-            const btnJogoSlots = document.getElementById('btnJogoSlots');
-            const popupSlots = document.getElementById('popupSlots');
-            const popupFecharSlots = document.getElementById('popupFecharSlots');
-            const popupSlotsHeader = document.getElementById('popupSlotsHeader');
-            const slot1 = document.getElementById('slot1');
-            const slot2 = document.getElementById('slot2');
-            const slot3 = document.getElementById('slot3');
-            const popupSaldoJogo = document.getElementById('popupSaldoJogo');
-            const slotsMensagemPopup = document.getElementById('slotsMensagemPopup');
-            const btnGirarPopup = document.getElementById('btnGirarPopup');
-            const btnResetarJogoPopup = document.getElementById('btnResetarJogoPopup');
-            const regrasSpan = document.getElementById('regrasDificuldade');
-            const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
-            
-            const btnLoja = document.getElementById('btnLojaNoSlot');
-            const popupLoja = document.getElementById('popupLoja');
-            const popupFecharLoja = document.getElementById('popupFecharLoja');
-            const popupLojaHeader = document.getElementById('popupLojaHeader');
-            const lojaSaldo = document.getElementById('lojaSaldo');
-            const vendedoraFala = document.getElementById('vendedoraFala');
-            const inventarioItens = document.getElementById('inventarioItens');
-            
-            const flyingFinaland = document.getElementById('flying-finaland');
-            let xDirection = 1, yDirection = 1, xPosition = 0, yPosition = 0, speed = 9;
-            let easterEggAtivo = false, easterEggTimeout = null, jumpscareTimeout = null;
-            let listaItens = [], modoOffline = false, itemAtualParaImagem = null, zoomAtual = 1;
-            
-            let saldoJogo = 20.00, girando = false, dificuldadeAtual = 'facil';
-            let simbolos = ['🍒', '💎', '7️⃣'];
-            const regrasDificuldade = {
-                facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
-                medio: { perda: 0.4, ganho: 1.0, texto: 'Perde 40% | Ganha 100%' },
-                dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
-            };
-            
-            let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
-            const precosItens = { uva: 150, pimenta: 270 };
+    const btnLogout = document.getElementById('btnLogout');
+    const btnAdicionar = document.getElementById('btnAdicionar');
+    const inputItem = document.getElementById('item');
+    const listaElement = document.getElementById('lista');
+    const estadoVazio = document.getElementById('estadoVazio');
+    const btnLimparComprados = document.getElementById('btnLimparComprados');
+    const statusConexao = document.getElementById('statusConexao');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const avisoVisual = document.getElementById('avisoVisual');
+    const uploadImagemInput = document.getElementById('uploadImagemInput');
+    const modalImagem = document.getElementById('modalImagem');
+    const modalImagemConteudo = document.getElementById('modalImagemConteudo');
+    const modalFechar = document.querySelector('.modal-fechar');
+    const modalZoomIn = document.getElementById('modalZoomIn');
+    const modalZoomOut = document.getElementById('modalZoomOut');
+    const modalResetZoom = document.getElementById('modalResetZoom');
+    
+    const btnJogoSlots = document.getElementById('btnJogoSlots');
+    const popupSlots = document.getElementById('popupSlots');
+    const popupFecharSlots = document.getElementById('popupFecharSlots');
+    const popupSlotsHeader = document.getElementById('popupSlotsHeader');
+    const slot1 = document.getElementById('slot1');
+    const slot2 = document.getElementById('slot2');
+    const slot3 = document.getElementById('slot3');
+    const popupSaldoJogo = document.getElementById('popupSaldoJogo');
+    const slotsMensagemPopup = document.getElementById('slotsMensagemPopup');
+    const btnGirarPopup = document.getElementById('btnGirarPopup');
+    const btnResetarJogoPopup = document.getElementById('btnResetarJogoPopup');
+    const regrasSpan = document.getElementById('regrasDificuldade');
+    const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
+    
+    const btnLoja = document.getElementById('btnLojaPopup');
+    const popupLoja = document.getElementById('popupLoja');
+    const popupFecharLoja = document.getElementById('popupFecharLoja');
+    const popupLojaHeader = document.getElementById('popupLojaHeader');
+    const lojaSaldo = document.getElementById('lojaSaldo');
+    const vendedoraFala = document.getElementById('vendedoraFala');
+    const inventarioItens = document.getElementById('inventarioItens');
+    
+    const flyingFinaland = document.getElementById('flying-finaland');
+    let xDirection = 1, yDirection = 1, xPosition = 0, yPosition = 0, speed = 9;
+    let easterEggAtivo = false, easterEggTimeout = null, jumpscareTimeout = null;
+    let listaItens = [], modoOffline = false, itemAtualParaImagem = null, zoomAtual = 1;
+    
+    let saldoJogo = 20.00, girando = false, dificuldadeAtual = 'facil';
+    let simbolos = ['🍒', '💎', '7️⃣'];
+    const regrasDificuldade = {
+        facil: { perda: 0.2, ganho: 2.5, texto: 'Perde 20% | Ganha 250%' },
+        medio: { perda: 0.4, ganho: 1.0, texto: 'Perde 40% | Ganha 100%' },
+        dificil: { perda: 0.8, ganho: 0.5, texto: 'Perde 80% | Ganha 50%' }
+    };
+    
+    let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
+    const precosItens = { uva: 150, pimenta: 270 };
 
-            flyingFinaland.style.opacity = '0';
-            flyingFinaland.style.transition = 'opacity 0.5s';
-            setTimeout(() => avisoVisual.style.opacity = '0.6', 1000);
+    flyingFinaland.style.opacity = '0';
+    flyingFinaland.style.transition = 'opacity 0.5s';
+    setTimeout(() => avisoVisual.style.opacity = '0.6', 1000);
 
-            let isDraggingSlots = false, isDraggingLoja = false;
-            let startX, startY, offsetX = 0, offsetY = 0, lojaOffsetX = 0, lojaOffsetY = 0;
+    let isDraggingSlots = false, isDraggingLoja = false;
+    let startX, startY, offsetX = 0, offsetY = 0, lojaOffsetX = 0, lojaOffsetY = 0;
 
-            function makeDraggable(popup, header, offsetState, setDragging) {
-                let startX, startY;
-                
-                header.addEventListener('mousedown', (e) => {
-                    if (e.target.closest('button')) return;
-                    e.preventDefault();
-                    startX = e.clientX - offsetState.x;
-                    startY = e.clientY - offsetState.y;
-                    setDragging(true);
-                    popup.style.cursor = 'grabbing';
-                });
-                
-                header.addEventListener('touchstart', (e) => {
-                    if (e.target.closest('button')) return;
-                    startX = e.touches[0].clientX - offsetState.x;
-                    startY = e.touches[0].clientY - offsetState.y;
-                    setDragging(true);
-                    popup.style.cursor = 'grabbing';
-                }, { passive: false });
-                
-                document.addEventListener('mousemove', (e) => {
-                    if (!setDragging()) return;
-                    e.preventDefault();
-                    offsetState.x = e.clientX - startX;
-                    offsetState.y = e.clientY - startY;
-                    popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
-                });
-                
-                document.addEventListener('touchmove', (e) => {
-                    if (!setDragging()) return;
-                    e.preventDefault();
-                    offsetState.x = e.touches[0].clientX - startX;
-                    offsetState.y = e.touches[0].clientY - startY;
-                    popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
-                }, { passive: false });
-                
-                document.addEventListener('mouseup', () => {
-                    setDragging(false);
-                    popup.style.cursor = 'default';
-                });
-                
-                document.addEventListener('touchend', () => {
-                    setDragging(false);
-                    popup.style.cursor = 'default';
-                });
-            }
-
-            const slotsOffset = { x: 0, y: 0 };
-            const lojaOffset = { x: 0, y: 0 };
-            
-            makeDraggable(popupSlots, popupSlotsHeader, slotsOffset, () => isDraggingSlots, (v) => isDraggingSlots = v);
-            makeDraggable(popupLoja, popupLojaHeader, lojaOffset, () => isDraggingLoja, (v) => isDraggingLoja = v);
-
-            botoesDificuldade.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dificuldadeAtual = btn.dataset.dificuldade;
-                    botoesDificuldade.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    regrasSpan.textContent = regrasDificuldade[dificuldadeAtual].texto;
-                });
-            });
-
-            function atualizarDisplaySaldo() {
-                const valor = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
-                popupSaldoJogo.textContent = valor;
-                lojaSaldo.textContent = valor;
-            }
-
-            function atualizarInventario() {
-                const itens = [];
-                if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
-                if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
-                inventarioItens.innerHTML = itens.length ? itens.map(i => `<span class="inventario-item">${i}</span>`).join('') : '<span class="inventario-vazio">Nenhum item comprado</span>';
-            }
-
-            function comprarItem(item) {
-                const preco = precosItens[item];
-                if (saldoJogo < preco) {
-                    vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
-                    vendedoraFala.style.color = 'var(--cor-erro)';
-                    setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
-                    return;
-                }
-                saldoJogo -= preco;
-                inventario[item]++;
-                if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
-                if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
-                vendedoraFala.style.color = 'var(--cor-sucesso)';
-                vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar!' : '🌶️ Pimenta comprada! 2 vitórias = +700%!';
-                setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
-                atualizarDisplaySaldo();
-                atualizarInventario();
-            }
-
-            function abrirPopupLoja() {
-                popupSlots.style.display = 'none';
-                popupLoja.style.display = 'block';
-                popupLoja.style.transform = 'translate(-50%, -50%)';
-                lojaOffset.x = lojaOffset.y = 0;
-                atualizarDisplaySaldo();
-                atualizarInventario();
-            }
-
-            function girarSlot(el) {
-                return new Promise(r => {
-                    let c = 0;
-                    const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 20) { clearInterval(i); r(el.textContent); } }, 50);
-                });
-            }
-
-            async function girarRoletas() {
-                if (girando || saldoJogo <= 0) { if (saldoJogo <= 0) { slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.'; slotsMensagemPopup.style.color = 'var(--cor-erro)'; } return; }
-                girando = true; btnGirarPopup.disabled = true;
-                slotsMensagemPopup.textContent = '🎲 Girando...'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                const [r1, r2, r3] = await Promise.all([girarSlot(slot1), girarSlot(slot2), girarSlot(slot3)]);
-                let ganhou = r1 === r2 && r2 === r3;
-                const regra = regrasDificuldade[dificuldadeAtual];
-                let mult = 1;
-                if (ganhou) {
-                    inventario.vitoriasConsecutivas++;
-                    if (r1 === '🍇' && inventario.uva > 0) { mult = 4.0; slotsMensagemPopup.textContent = '🍇 UVA! 400%!'; }
-                    if (inventario.pimenta > 0) {
-                        if (inventario.vitoriasConsecutivas >= 2) inventario.pimentaAtiva = true;
-                        if (inventario.pimentaAtiva) { mult = 7.0; slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!'; inventario.pimentaAtiva = false; inventario.vitoriasConsecutivas = 0; }
-                    }
-                    const ganho = saldoJogo * regra.ganho * mult;
-                    saldoJogo += ganho;
-                    slotsMensagemPopup.textContent = mult === 1 ? `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!` : slotsMensagemPopup.textContent + ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
-                    slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
-                } else {
-                    inventario.vitoriasConsecutivas = 0; inventario.pimentaAtiva = false;
-                    const perda = saldoJogo * regra.perda;
-                    saldoJogo -= perda;
-                    slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
-                    slotsMensagemPopup.style.color = 'var(--cor-erro)';
-                }
-                if (saldoJogo < 0.01) { saldoJogo = 0; slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.'; }
-                atualizarDisplaySaldo();
-                girando = false; btnGirarPopup.disabled = false;
-            }
-
-            function resetarJogo() {
-                saldoJogo = 20.00;
-                slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
-                slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
-                simbolos = ['🍒', '💎', '7️⃣'];
-                atualizarDisplaySaldo(); atualizarInventario();
-                girando = false; btnGirarPopup.disabled = false;
-            }
-
-            function abrirPopupSlots() {
-                if (popupLoja.style.display === 'block') popupLoja.style.display = 'none';
-                popupSlots.style.display = 'block';
-                popupSlots.style.transform = 'translate(-50%, -50%)';
-                slotsOffset.x = slotsOffset.y = 0;
-                atualizarDisplaySaldo();
-            }
-
-            btnJogoSlots.addEventListener('click', abrirPopupSlots);
-            popupFecharSlots.addEventListener('click', () => popupSlots.style.display = 'none');
-            btnGirarPopup.addEventListener('click', girarRoletas);
-            btnResetarJogoPopup.addEventListener('click', resetarJogo);
-            btnLoja.addEventListener('click', abrirPopupLoja);
-            popupFecharLoja.addEventListener('click', () => popupLoja.style.display = 'none');
-            document.querySelectorAll('.btn-comprar-item').forEach(b => b.addEventListener('click', () => comprarItem(b.dataset.item)));
-
-            modalFechar.addEventListener('click', () => { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
-            modalImagem.addEventListener('click', (e) => { if (e.target === modalImagem) { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; } });
-            modalZoomIn.addEventListener('click', () => { zoomAtual = Math.min(zoomAtual + 0.25, 3); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
-            modalZoomOut.addEventListener('click', () => { zoomAtual = Math.max(zoomAtual - 0.25, 0.5); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
-            modalResetZoom.addEventListener('click', () => { zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
-
-            function comprimirImagem(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            let w = img.width, h = img.height;
-                            const max = 800;
-                            if (w > max || h > max) { if (w > h) { h = (h / w) * max; w = max; } else { w = (w / h) * max; h = max; } }
-                            canvas.width = w; canvas.height = h;
-                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                            resolve(canvas.toDataURL('image/jpeg', 0.7));
-                        };
-                        img.onerror = reject;
-                        img.src = e.target.result;
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            function abrirSeletorImagem(i) { itemAtualParaImagem = i; uploadImagemInput.click(); }
-            uploadImagemInput.addEventListener('change', async (e) => {
-                const f = e.target.files[0];
-                if (!f || itemAtualParaImagem === null) return;
-                if (!f.type.startsWith('image/')) { alert('Selecione uma imagem.'); return; }
-                if (f.size > 5 * 1024 * 1024) { alert('Máximo 5MB.'); return; }
-                try {
-                    loadingOverlay.style.display = 'flex';
-                    const b64 = await comprimirImagem(f);
-                    if (listaItens[itemAtualParaImagem]) { listaItens[itemAtualParaImagem].imagem = b64; salvarLista(); renderizarLista(); }
-                } catch (er) { alert('Erro ao processar.'); }
-                finally { loadingOverlay.style.display = 'none'; uploadImagemInput.value = ''; itemAtualParaImagem = null; }
-            });
-
-            function removerImagem(i) { if (listaItens[i]) { delete listaItens[i].imagem; salvarLista(); renderizarLista(); } }
-
-            function moveFinaland() { if (!easterEggAtivo) return; xPosition += speed * xDirection; yPosition += speed * yDirection; if (xPosition >= innerWidth - 50 || xPosition <= 0) xDirection *= -1; if (yPosition >= innerHeight - 50 || yPosition <= 0) yDirection *= -1; flyingFinaland.style.left = xPosition + 'px'; flyingFinaland.style.top = yPosition + 'px'; }
-            setInterval(moveFinaland, 50);
-
-            function shakeScreen() { const c = document.querySelector('.app-container'); c.style.transition = 'transform 0.05s'; let s = 0; const i = setInterval(() => { c.style.transform = `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)`; if (++s >= 10) { clearInterval(i); c.style.transform = ''; c.style.transition = ''; } }, 50); }
-
-            function atualizarEstadoVazio() { if (listaItens.length === 0) { estadoVazio.style.display = 'flex'; listaElement.style.display = 'none'; btnLimparComprados.style.display = 'none'; } else { estadoVazio.style.display = 'none'; listaElement.style.display = 'block'; btnLimparComprados.style.display = listaItens.some(i => i.comprado) ? 'block' : 'none'; } }
-
-            function salvarLista() { localStorage.setItem('listaCompras', JSON.stringify(listaItens)); avisoVisual.style.opacity = '1'; avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)'; avisoVisual.style.borderLeftColor = '#fff'; avisoVisual.style.color = '#fff'; avisoVisual.querySelector('span').textContent = 'Lista salva!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.'; }, 2000); }
-
-            function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 100); }
-
-            function renderizarLista() {
-                listaElement.innerHTML = '';
-                if (!listaItens.length) { atualizarEstadoVazio(); return; }
-                listaItens.forEach((item, i) => {
-                    const li = document.createElement('li'); li.className = `item-lista ${item.comprado ? 'comprado' : ''}`;
-                    li.innerHTML = `<div class="item-principal"><div class="item-conteudo"><input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${i}">${item.imagem ? `<div class="item-imagem-container"><img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')"><button class="btn-remover-imagem" data-index="${i}"><i class="fas fa-times"></i></button></div>` : ''}<span class="item-nome">${item.nome}</span><span class="item-quantidade">${item.quantidade || 1}x</span></div><div class="item-acoes"><button class="btn-icon-small btn-imagem" data-index="${i}"><i class="fas fa-camera"></i></button><button class="btn-icon-small btn-diminuir" data-index="${i}"><i class="fas fa-minus"></i></button><button class="btn-icon-small btn-aumentar" data-index="${i}"><i class="fas fa-plus"></i></button><button class="btn-icon-small btn-remover" data-index="${i}"><i class="fas fa-trash-alt"></i></button></div></div>`;
-                    listaElement.appendChild(li);
-                });
-                document.querySelectorAll('.item-checkbox').forEach(cb => cb.addEventListener('change', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].comprado = this.checked; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-diminuir').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i] && listaItens[i].quantidade > 1) { listaItens[i].quantidade--; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-aumentar').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].quantidade = (listaItens[i].quantidade || 1) + 1; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-remover').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens.splice(i, 1); salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-imagem').forEach(b => b.addEventListener('click', function() { abrirSeletorImagem(+this.dataset.index); }));
-                document.querySelectorAll('.btn-remover-imagem').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); removerImagem(+this.dataset.index); }));
-                atualizarEstadoVazio();
-            }
-
-            function adicionarItem() { const n = inputItem.value.trim(); if (n) { listaItens.push({ nome: n, quantidade: 1, comprado: false }); salvarLista(); renderizarLista(); inputItem.value = ''; inputItem.focus(); } }
-            function limparComprados() { listaItens = listaItens.filter(i => !i.comprado); salvarLista(); renderizarLista(); }
-            function logout() { window.logout ? window.logout() : location.href = 'login.html'; }
-
-            btnAdicionar.addEventListener('click', adicionarItem);
-            inputItem.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(); });
-            inputItem.addEventListener('focus', () => { if (listaItens.length && !listaElement.children.length) { renderizarLista(); avisoVisual.style.opacity = '1'; avisoVisual.querySelector('span').textContent = 'Lista restaurada!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual.'; }, 2000); } });
-            btnLimparComprados.addEventListener('click', limparComprados);
-            btnLogout.addEventListener('click', logout);
-            window.addEventListener('online', () => { modoOffline = false; statusConexao.className = 'status-indicator online'; statusConexao.title = 'Online'; loadingOverlay.style.display = 'none'; });
-            window.addEventListener('offline', () => { modoOffline = true; statusConexao.className = 'status-indicator offline'; statusConexao.title = 'Offline'; });
-
-            let konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], kIdx = 0;
-            document.addEventListener('keydown', (e) => { if (e.key === konami[kIdx]) { kIdx++; if (kIdx === konami.length) { ativarEasterEgg(); kIdx = 0; } } else kIdx = 0; });
-
-            function ativarEasterEgg() { if (easterEggAtivo) return; easterEggAtivo = true; const bg = document.createElement('div'); bg.id = 'easter-egg-bg'; bg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-image:url(blackman.jpg);background-position:center;background-repeat:no-repeat;background-size:contain;opacity:0;pointer-events:none;z-index:9998;transition:opacity 2s,transform 0.3s;'; document.body.appendChild(bg); setTimeout(() => { bg.style.opacity = '0.1'; flyingFinaland.style.opacity = '1'; }, 50); jumpscareTimeout = setTimeout(() => { bg.style.transition = 'opacity 0.1s, transform 0.2s'; bg.style.opacity = '1'; bg.style.transform = 'scale(1.3)'; shakeScreen(); setTimeout(() => { bg.style.transition = 'opacity 1s, transform 0.3s'; bg.style.opacity = '0.1'; bg.style.transform = 'scale(1)'; }, 300); }, 3000); const spd = speed; speed = 18; easterEggTimeout = setTimeout(() => { bg.style.opacity = '0'; speed = spd; flyingFinaland.style.opacity = '0'; setTimeout(() => { bg.remove(); easterEggAtivo = false; }, 2000); }, 15000); }
-
-            carregarLista();
-            atualizarDisplaySaldo();
-            atualizarInventario();
+    function makeDraggable(popup, header, offsetState, setDragging) {
+        let startX, startY;
+        
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.closest('button')) return;
+            e.preventDefault();
+            startX = e.clientX - offsetState.x;
+            startY = e.clientY - offsetState.y;
+            setDragging(true);
+            popup.style.cursor = 'grabbing';
         });
+        
+        header.addEventListener('touchstart', (e) => {
+            if (e.target.closest('button')) return;
+            startX = e.touches[0].clientX - offsetState.x;
+            startY = e.touches[0].clientY - offsetState.y;
+            setDragging(true);
+            popup.style.cursor = 'grabbing';
+        }, { passive: false });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!setDragging()) return;
+            e.preventDefault();
+            offsetState.x = e.clientX - startX;
+            offsetState.y = e.clientY - startY;
+            popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!setDragging()) return;
+            e.preventDefault();
+            offsetState.x = e.touches[0].clientX - startX;
+            offsetState.y = e.touches[0].clientY - startY;
+            popup.style.transform = `translate(calc(-50% + ${offsetState.x}px), calc(-50% + ${offsetState.y}px))`;
+        }, { passive: false });
+        
+        document.addEventListener('mouseup', () => {
+            setDragging(false);
+            popup.style.cursor = 'default';
+        });
+        
+        document.addEventListener('touchend', () => {
+            setDragging(false);
+            popup.style.cursor = 'default';
+        });
+    }
+
+    const slotsOffset = { x: 0, y: 0 };
+    const lojaOffset = { x: 0, y: 0 };
+    
+    makeDraggable(popupSlots, popupSlotsHeader, slotsOffset, () => isDraggingSlots, (v) => isDraggingSlots = v);
+    makeDraggable(popupLoja, popupLojaHeader, lojaOffset, () => isDraggingLoja, (v) => isDraggingLoja = v);
+
+    botoesDificuldade.forEach(btn => {
+        btn.addEventListener('click', () => {
+            dificuldadeAtual = btn.dataset.dificuldade;
+            botoesDificuldade.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            regrasSpan.textContent = regrasDificuldade[dificuldadeAtual].texto;
+        });
+    });
+
+    function atualizarDisplaySaldo() {
+        const valor = `R$ ${saldoJogo.toFixed(2).replace('.', ',')}`;
+        popupSaldoJogo.textContent = valor;
+        lojaSaldo.textContent = valor;
+    }
+
+    function atualizarInventario() {
+        const itens = [];
+        if (inventario.uva > 0) itens.push(`${inventario.uva}x 🍇 Uva`);
+        if (inventario.pimenta > 0) itens.push(`${inventario.pimenta}x 🌶️ Pimenta`);
+        inventarioItens.innerHTML = itens.length ? itens.map(i => `<span class="inventario-item">${i}</span>`).join('') : '<span class="inventario-vazio">Nenhum item comprado</span>';
+    }
+
+    function comprarItem(item) {
+        const preco = precosItens[item];
+        if (saldoJogo < preco) {
+            vendedoraFala.textContent = '💰 Dinheiro insuficiente!';
+            vendedoraFala.style.color = 'var(--cor-erro)';
+            setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 2000);
+            return;
+        }
+        saldoJogo -= preco;
+        inventario[item]++;
+        if (item === 'uva' && !simbolos.includes('🍇')) simbolos.push('🍇');
+        if (item === 'pimenta' && !simbolos.includes('🌶️')) simbolos.push('🌶️');
+        vendedoraFala.style.color = 'var(--cor-sucesso)';
+        vendedoraFala.textContent = item === 'uva' ? '🍇 Uva adicionada! +400% ao ganhar!' : '🌶️ Pimenta comprada! 2 vitórias = +700%!';
+        setTimeout(() => { vendedoraFala.textContent = 'O que tu precisa?'; vendedoraFala.style.color = 'var(--cor-primaria-2)'; }, 3000);
+        atualizarDisplaySaldo();
+        atualizarInventario();
+    }
+
+    function abrirPopupLoja() {
+        popupSlots.style.display = 'none';
+        popupLoja.style.display = 'block';
+        popupLoja.style.transform = 'translate(-50%, -50%)';
+        lojaOffset.x = lojaOffset.y = 0;
+        atualizarDisplaySaldo();
+        atualizarInventario();
+    }
+
+    function girarSlot(el) {
+        return new Promise(r => {
+            let c = 0;
+            const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 20) { clearInterval(i); r(el.textContent); } }, 50);
+        });
+    }
+
+    async function girarRoletas() {
+        if (girando || saldoJogo <= 0) { if (saldoJogo <= 0) { slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.'; slotsMensagemPopup.style.color = 'var(--cor-erro)'; } return; }
+        girando = true; btnGirarPopup.disabled = true;
+        slotsMensagemPopup.textContent = '🎲 Girando...'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+        const [r1, r2, r3] = await Promise.all([girarSlot(slot1), girarSlot(slot2), girarSlot(slot3)]);
+        let ganhou = r1 === r2 && r2 === r3;
+        const regra = regrasDificuldade[dificuldadeAtual];
+        let mult = 1;
+        if (ganhou) {
+            inventario.vitoriasConsecutivas++;
+            if (r1 === '🍇' && inventario.uva > 0) { mult = 4.0; slotsMensagemPopup.textContent = '🍇 UVA! 400%!'; }
+            if (inventario.pimenta > 0) {
+                if (inventario.vitoriasConsecutivas >= 2) inventario.pimentaAtiva = true;
+                if (inventario.pimentaAtiva) { mult = 7.0; slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!'; inventario.pimentaAtiva = false; inventario.vitoriasConsecutivas = 0; }
+            }
+            const ganho = saldoJogo * regra.ganho * mult;
+            saldoJogo += ganho;
+            slotsMensagemPopup.textContent = mult === 1 ? `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!` : slotsMensagemPopup.textContent + ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+            slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
+        } else {
+            inventario.vitoriasConsecutivas = 0; inventario.pimentaAtiva = false;
+            const perda = saldoJogo * regra.perda;
+            saldoJogo -= perda;
+            slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
+            slotsMensagemPopup.style.color = 'var(--cor-erro)';
+        }
+        if (saldoJogo < 0.01) { saldoJogo = 0; slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.'; }
+        atualizarDisplaySaldo();
+        girando = false; btnGirarPopup.disabled = false;
+    }
+
+    function resetarJogo() {
+        saldoJogo = 20.00;
+        slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
+        slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+        inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
+        simbolos = ['🍒', '💎', '7️⃣'];
+        atualizarDisplaySaldo(); atualizarInventario();
+        girando = false; btnGirarPopup.disabled = false;
+    }
+
+    function abrirPopupSlots() {
+        if (popupLoja.style.display === 'block') popupLoja.style.display = 'none';
+        popupSlots.style.display = 'block';
+        popupSlots.style.transform = 'translate(-50%, -50%)';
+        slotsOffset.x = slotsOffset.y = 0;
+        atualizarDisplaySaldo();
+    }
+
+    btnJogoSlots.addEventListener('click', abrirPopupSlots);
+    popupFecharSlots.addEventListener('click', () => popupSlots.style.display = 'none');
+    btnGirarPopup.addEventListener('click', girarRoletas);
+    btnResetarJogoPopup.addEventListener('click', resetarJogo);
+    btnLoja.addEventListener('click', abrirPopupLoja);
+    popupFecharLoja.addEventListener('click', () => popupLoja.style.display = 'none');
+    document.querySelectorAll('.btn-comprar-item').forEach(b => b.addEventListener('click', () => comprarItem(b.dataset.item)));
+
+    modalFechar.addEventListener('click', () => { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
+    modalImagem.addEventListener('click', (e) => { if (e.target === modalImagem) { modalImagem.style.display = 'none'; zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; } });
+    modalZoomIn.addEventListener('click', () => { zoomAtual = Math.min(zoomAtual + 0.25, 3); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
+    modalZoomOut.addEventListener('click', () => { zoomAtual = Math.max(zoomAtual - 0.25, 0.5); modalImagemConteudo.style.transform = `scale(${zoomAtual})`; });
+    modalResetZoom.addEventListener('click', () => { zoomAtual = 1; modalImagemConteudo.style.transform = 'scale(1)'; });
+
+    function comprimirImagem(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const max = 800;
+                    if (w > max || h > max) { if (w > h) { h = (h / w) * max; w = max; } else { w = (w / h) * max; h = max; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function abrirSeletorImagem(i) { itemAtualParaImagem = i; uploadImagemInput.click(); }
+    uploadImagemInput.addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f || itemAtualParaImagem === null) return;
+        if (!f.type.startsWith('image/')) { alert('Selecione uma imagem.'); return; }
+        if (f.size > 5 * 1024 * 1024) { alert('Máximo 5MB.'); return; }
+        try {
+            loadingOverlay.style.display = 'flex';
+            const b64 = await comprimirImagem(f);
+            if (listaItens[itemAtualParaImagem]) { listaItens[itemAtualParaImagem].imagem = b64; salvarLista(); renderizarLista(); }
+        } catch (er) { alert('Erro ao processar.'); }
+        finally { loadingOverlay.style.display = 'none'; uploadImagemInput.value = ''; itemAtualParaImagem = null; }
+    });
+
+    function removerImagem(i) { if (listaItens[i]) { delete listaItens[i].imagem; salvarLista(); renderizarLista(); } }
+
+    function moveFinaland() { if (!easterEggAtivo) return; xPosition += speed * xDirection; yPosition += speed * yDirection; if (xPosition >= innerWidth - 50 || xPosition <= 0) xDirection *= -1; if (yPosition >= innerHeight - 50 || yPosition <= 0) yDirection *= -1; flyingFinaland.style.left = xPosition + 'px'; flyingFinaland.style.top = yPosition + 'px'; }
+    setInterval(moveFinaland, 50);
+
+    function shakeScreen() { const c = document.querySelector('.app-container'); c.style.transition = 'transform 0.05s'; let s = 0; const i = setInterval(() => { c.style.transform = `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)`; if (++s >= 10) { clearInterval(i); c.style.transform = ''; c.style.transition = ''; } }, 50); }
+
+    function atualizarEstadoVazio() { if (listaItens.length === 0) { estadoVazio.style.display = 'flex'; listaElement.style.display = 'none'; btnLimparComprados.style.display = 'none'; } else { estadoVazio.style.display = 'none'; listaElement.style.display = 'block'; btnLimparComprados.style.display = listaItens.some(i => i.comprado) ? 'block' : 'none'; } }
+
+    function salvarLista() { localStorage.setItem('listaCompras', JSON.stringify(listaItens)); avisoVisual.style.opacity = '1'; avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)'; avisoVisual.style.borderLeftColor = '#fff'; avisoVisual.style.color = '#fff'; avisoVisual.querySelector('span').textContent = 'Lista salva!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.'; }, 2000); }
+
+    function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 100); }
+
+    function renderizarLista() {
+        listaElement.innerHTML = '';
+        if (!listaItens.length) { atualizarEstadoVazio(); return; }
+        listaItens.forEach((item, i) => {
+            const li = document.createElement('li'); li.className = `item-lista ${item.comprado ? 'comprado' : ''}`;
+            li.innerHTML = `<div class="item-principal"><div class="item-conteudo"><input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${i}">${item.imagem ? `<div class="item-imagem-container"><img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')"><button class="btn-remover-imagem" data-index="${i}"><i class="fas fa-times"></i></button></div>` : ''}<span class="item-nome">${item.nome}</span><span class="item-quantidade">${item.quantidade || 1}x</span></div><div class="item-acoes"><button class="btn-icon-small btn-imagem" data-index="${i}"><i class="fas fa-camera"></i></button><button class="btn-icon-small btn-diminuir" data-index="${i}"><i class="fas fa-minus"></i></button><button class="btn-icon-small btn-aumentar" data-index="${i}"><i class="fas fa-plus"></i></button><button class="btn-icon-small btn-remover" data-index="${i}"><i class="fas fa-trash-alt"></i></button></div></div>`;
+            listaElement.appendChild(li);
+        });
+        document.querySelectorAll('.item-checkbox').forEach(cb => cb.addEventListener('change', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].comprado = this.checked; salvarLista(); renderizarLista(); } }));
+        document.querySelectorAll('.btn-diminuir').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i] && listaItens[i].quantidade > 1) { listaItens[i].quantidade--; salvarLista(); renderizarLista(); } }));
+        document.querySelectorAll('.btn-aumentar').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].quantidade = (listaItens[i].quantidade || 1) + 1; salvarLista(); renderizarLista(); } }));
+        document.querySelectorAll('.btn-remover').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens.splice(i, 1); salvarLista(); renderizarLista(); } }));
+        document.querySelectorAll('.btn-imagem').forEach(b => b.addEventListener('click', function() { abrirSeletorImagem(+this.dataset.index); }));
+        document.querySelectorAll('.btn-remover-imagem').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); removerImagem(+this.dataset.index); }));
+        atualizarEstadoVazio();
+    }
+
+    function adicionarItem() { const n = inputItem.value.trim(); if (n) { listaItens.push({ nome: n, quantidade: 1, comprado: false }); salvarLista(); renderizarLista(); inputItem.value = ''; inputItem.focus(); } }
+    function limparComprados() { listaItens = listaItens.filter(i => !i.comprado); salvarLista(); renderizarLista(); }
+    function logout() { window.logout ? window.logout() : location.href = 'login.html'; }
+
+    btnAdicionar.addEventListener('click', adicionarItem);
+    inputItem.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(); });
+    inputItem.addEventListener('focus', () => { if (listaItens.length && !listaElement.children.length) { renderizarLista(); avisoVisual.style.opacity = '1'; avisoVisual.querySelector('span').textContent = 'Lista restaurada!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual.'; }, 2000); } });
+    btnLimparComprados.addEventListener('click', limparComprados);
+    btnLogout.addEventListener('click', logout);
+    window.addEventListener('online', () => { modoOffline = false; statusConexao.className = 'status-indicator online'; statusConexao.title = 'Online'; loadingOverlay.style.display = 'none'; });
+    window.addEventListener('offline', () => { modoOffline = true; statusConexao.className = 'status-indicator offline'; statusConexao.title = 'Offline'; });
+
+    let konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], kIdx = 0;
+    document.addEventListener('keydown', (e) => { if (e.key === konami[kIdx]) { kIdx++; if (kIdx === konami.length) { ativarEasterEgg(); kIdx = 0; } } else kIdx = 0; });
+
+    function ativarEasterEgg() { if (easterEggAtivo) return; easterEggAtivo = true; const bg = document.createElement('div'); bg.id = 'easter-egg-bg'; bg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-image:url(blackman.jpg);background-position:center;background-repeat:no-repeat;background-size:contain;opacity:0;pointer-events:none;z-index:9998;transition:opacity 2s,transform 0.3s;'; document.body.appendChild(bg); setTimeout(() => { bg.style.opacity = '0.1'; flyingFinaland.style.opacity = '1'; }, 50); jumpscareTimeout = setTimeout(() => { bg.style.transition = 'opacity 0.1s, transform 0.2s'; bg.style.opacity = '1'; bg.style.transform = 'scale(1.3)'; shakeScreen(); setTimeout(() => { bg.style.transition = 'opacity 1s, transform 0.3s'; bg.style.opacity = '0.1'; bg.style.transform = 'scale(1)'; }, 300); }, 3000); const spd = speed; speed = 18; easterEggTimeout = setTimeout(() => { bg.style.opacity = '0'; speed = spd; flyingFinaland.style.opacity = '0'; setTimeout(() => { bg.remove(); easterEggAtivo = false; }, 2000); }, 15000); }
+
+    carregarLista();
+    atualizarDisplaySaldo();
+    atualizarInventario();
+});
     </script>
     <script type="module" src="app.js"></script>
 </body>
