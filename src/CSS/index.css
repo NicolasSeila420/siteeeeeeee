@@ -634,34 +634,6 @@ body {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.btn-loja {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--container-bg);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px var(--shadow-color);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    padding: 8px;
-}
-
-.btn-loja:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 20px var(--shadow-color);
-}
-
-#lojaIcon {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
 .modal-imagem {
     display: none;
     position: fixed;
@@ -803,15 +775,42 @@ body {
 .popup-slots-acoes {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+}
+
+.btn-loja-no-slot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--container-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 5px;
+}
+
+.btn-loja-no-slot:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#lojaIconSlot {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .popup-saldo {
     background: linear-gradient(135deg, #f39c12, #e67e22);
     color: #ffffff;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 40px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: bold;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -1014,8 +1013,8 @@ body {
 }
 
 .vendedora-img {
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
     border: none;
     border-bottom: 2px solid #f39c12;
@@ -1177,7 +1176,7 @@ body {
     .item-acoes { justify-content: flex-end; }
     .item-imagem-thumb { width: 32px; height: 32px; }
     .botoes-flutuantes { bottom: 16px; right: 16px; gap: 10px; }
-    .theme-toggle, .btn-jogo-slots, .btn-loja { width: 44px; height: 44px; }
+    .theme-toggle, .btn-jogo-slots { width: 44px; height: 44px; }
     .modal-controles { bottom: 20px; padding: 8px 16px; gap: 8px; }
     .btn-modal-controle { width: 40px; height: 40px; font-size: 1rem; }
     .modal-fechar { top: 10px; right: 15px; font-size: 30px; }
@@ -1189,5 +1188,6 @@ body {
     .item-loja { flex-direction: row; justify-content: space-between; padding: 10px 14px; }
     .item-icone { font-size: 1.8rem; margin: 0; }
     .item-descricao { white-space: normal; width: 180px; }
-    .vendedora-img { width: 80px; height: 80px; }
+    .vendedora-img { width: 140px; height: 140px; }
+    .btn-loja-no-slot { width: 28px; height: 28px; }
 }

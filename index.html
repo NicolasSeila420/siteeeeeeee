@@ -76,10 +76,6 @@
         <button id="btnJogoSlots" class="btn-jogo-slots" aria-label="Jogo de Slots">
             <i class="fas fa-dice"></i>
         </button>
-        
-        <button id="btnLoja" class="btn-loja" aria-label="Loja">
-            <img src="iconvendedoragostosamodoclaro.png" alt="Loja" id="lojaIcon">
-        </button>
     </div>
 
     <div id="modalImagem" class="modal-imagem" style="display: none;">
@@ -105,6 +101,9 @@
                 Slots da Sorte
             </h3>
             <div class="popup-slots-acoes">
+                <button id="btnLojaNoSlot" class="btn-loja-no-slot" aria-label="Loja">
+                    <img src="iconvendedoragostosamodoclaro.png" alt="Loja" id="lojaIconSlot">
+                </button>
                 <span class="popup-saldo" id="popupSaldoJogo">R$ 20,00</span>
                 <button id="popupFecharSlots" class="popup-fechar" aria-label="Fechar">
                     <i class="fas fa-times"></i>
@@ -214,7 +213,7 @@
         (function() {
             const themeToggle = document.getElementById('themeToggle');
             const html = document.documentElement;
-            const lojaIcon = document.getElementById('lojaIcon');
+            const lojaIcon = document.getElementById('lojaIconSlot');
             
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
@@ -281,7 +280,7 @@
             const regrasSpan = document.getElementById('regrasDificuldade');
             const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
             
-            const btnLoja = document.getElementById('btnLoja');
+            const btnLoja = document.getElementById('btnLojaNoSlot');
             const popupLoja = document.getElementById('popupLoja');
             const popupFecharLoja = document.getElementById('popupFecharLoja');
             const popupLojaHeader = document.getElementById('popupLojaHeader');
@@ -407,7 +406,7 @@
             }
 
             function abrirPopupLoja() {
-                if (popupSlots.style.display === 'block') popupSlots.style.display = 'none';
+                popupSlots.style.display = 'none';
                 popupLoja.style.display = 'block';
                 popupLoja.style.transform = 'translate(-50%, -50%)';
                 lojaOffset.x = lojaOffset.y = 0;
