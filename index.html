@@ -424,7 +424,7 @@
             function girarSlot(el) {
                 return new Promise(r => {
                     let c = 0;
-                    const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 100) { clearInterval(i); r(el.textContent); } }, 50);
+                    const i = setInterval(() => { el.textContent = simbolos[Math.floor(Math.random() * simbolos.length)]; if (++c >= 15) { clearInterval(i); r(el.textContent); } }, 50);
                 });
             }
 
@@ -545,7 +545,7 @@
 
             function salvarLista() { localStorage.setItem('listaCompras', JSON.stringify(listaItens)); avisoVisual.style.opacity = '1'; avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)'; avisoVisual.style.borderLeftColor = '#fff'; avisoVisual.style.color = '#fff'; avisoVisual.querySelector('span').textContent = 'Lista salva!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.'; }, 2000); }
 
-            function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 100); }
+            function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 10); }
 
             function renderizarLista() {
                 listaElement.innerHTML = '';
