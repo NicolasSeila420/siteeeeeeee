@@ -101,7 +101,7 @@
                 Slots da Sorte
             </h3>
             <div class="popup-slots-acoes">
-                <span class="popup-saldo" id="popupSaldoJogo">R$ 100,00</span>
+                <span class="popup-saldo" id="popupSaldoJogo">R$ 50,00</span>
                 <button id="popupFecharSlots" class="popup-fechar" aria-label="Fechar">
                     <i class="fas fa-times"></i>
                 </button>
@@ -156,7 +156,7 @@
                 Loja da Sorte
             </h3>
             <div class="popup-slots-acoes">
-                <span class="popup-saldo" id="lojaSaldo">R$ 100,00</span>
+                <span class="popup-saldo" id="lojaSaldo">R$ 50,00</span>
                 <button id="popupFecharLoja" class="popup-fechar" aria-label="Fechar">
                     <i class="fas fa-times"></i>
                 </button>
@@ -284,7 +284,7 @@
             let easterEggAtivo = false, easterEggTimeout = null, jumpscareTimeout = null;
             let listaItens = [], modoOffline = false, itemAtualParaImagem = null, zoomAtual = 1;
             
-            let saldoJogo = 100.00, girando = false, dificuldadeAtual = 'facil';
+            let saldoJogo = 50.00, girando = false, dificuldadeAtual = 'facil';
             let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
                 facil: { perda: 0.1, ganho: 3.0, texto: 'Perde R$ 10% | Ganha R$ 300%' },
@@ -460,7 +460,7 @@
             }
 
             function resetarJogo() {
-                saldoJogo = 100.00;
+                saldoJogo = 50.00;
                 slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
                 slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
                 inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
