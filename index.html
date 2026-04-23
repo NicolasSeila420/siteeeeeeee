@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    
+    <div id="telaCarregamento" class="tela-carregamento">
+        <div class="carregamento-conteudo">
+            <div class="carregamento-spinner"></div>
+            <p class="carregamento-texto">Carregando seus dados...</p>
+            <span class="carregamento-subtexto">Isso pode levar alguns segundos</span>
+        </div>
+    </div>
+
     <div id="avisoVisual" class="aviso-visual">
         <i class="fas fa-exclamation-triangle"></i>
         <span>Possível atraso visual. Dados salvos. Continue digitando.</span>
@@ -437,34 +444,81 @@
             }
 
             async function girarRoletas() {
-                if (girando || saldoJogo <= 0) { if (saldoJogo <= 0) { slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.'; slotsMensagemPopup.style.color = 'var(--cor-erro)'; } return; }
-                girando = true; btnGirarPopup.disabled = true;
-                slotsMensagemPopup.textContent = '🎲 Girando...'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
-                const [r1, r2, r3] = await Promise.all([girarSlot(slot1), girarSlot(slot2), girarSlot(slot3)]);
-                let ganhou = r1 === r2 && r2 === r3;
+                if (girando || saldoJogo <= 0) {
+                    if (saldoJogo <= 0) {
+                        slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.';
+                        slotsMensagemPopup.style.color = 'var(--cor-erro)';
+                    }
+                    return;
+                }
+                
+                girando = true;
+                btnGirarPopup.disabled = true;
+                slotsMensagemPopup.textContent = '🎲 Girando...';
+                slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+                
+                const [r1, r2, r3] = await Promise.all([
+                    girarSlot(slot1),
+                    girarSlot(slot2),
+                    girarSlot(slot3)
+                ]);
+                
+                const todosIguais = (r1 === r2 && r2 === r3);
+                const doisIguais = (r1 === r2 || r2 === r3 || r1 === r3) && !todosIguais;
+                
                 const regra = regrasDificuldade[dificuldadeAtual];
                 let mult = 1;
-                if (ganhou) {
+                
+                if (todosIguais) {
                     inventario.vitoriasConsecutivas++;
-                    if (r1 === '🍇' && inventario.uva > 0) { mult = 4.0; slotsMensagemPopup.textContent = '🍇 UVA! 400%!'; }
-                    if (inventario.pimenta > 0) {
-                        if (inventario.vitoriasConsecutivas >= 2) inventario.pimentaAtiva = true;
-                        if (inventario.pimentaAtiva) { mult = 7.0; slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!'; inventario.pimentaAtiva = false; inventario.vitoriasConsecutivas = 0; }
+                    
+                    if (r1 === '🍇' && inventario.uva > 0) {
+                        mult = 4.0;
+                        slotsMensagemPopup.textContent = '🍇 UVA! 400%!';
                     }
+                    
+                    if (inventario.pimenta > 0) {
+                        if (inventario.vitoriasConsecutivas >= 2) {
+                            inventario.pimentaAtiva = true;
+                        }
+                        if (inventario.pimentaAtiva) {
+                            mult = 7.0;
+                            slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!';
+                            inventario.pimentaAtiva = false;
+                            inventario.vitoriasConsecutivas = 0;
+                        }
+                    }
+                    
                     const ganho = saldoJogo * regra.ganho * mult;
                     saldoJogo += ganho;
-                    slotsMensagemPopup.textContent = mult === 1 ? `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!` : slotsMensagemPopup.textContent + ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+                    
+                    if (mult === 1) {
+                        slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+                    } else {
+                        slotsMensagemPopup.textContent += ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+                    }
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
+                } else if (doisIguais) {
+                    slotsMensagemPopup.textContent = '🤝 Empate! Não ganhou nem perdeu.';
+                    slotsMensagemPopup.style.color = '#f39c12';
                 } else {
-                    inventario.vitoriasConsecutivas = 0; inventario.pimentaAtiva = false;
+                    inventario.vitoriasConsecutivas = 0;
+                    inventario.pimentaAtiva = false;
+                    
                     const perda = saldoJogo * regra.perda;
                     saldoJogo -= perda;
                     slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
                     slotsMensagemPopup.style.color = 'var(--cor-erro)';
                 }
-                if (saldoJogo < 0.01) { saldoJogo = 0; slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.'; }
+                
+                if (saldoJogo < 0.01) {
+                    saldoJogo = 0;
+                    slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.';
+                }
+                
                 atualizarDisplaySaldo();
-                girando = false; btnGirarPopup.disabled = false;
+                girando = false;
+                btnGirarPopup.disabled = false;
             }
 
             function resetarJogo() {
