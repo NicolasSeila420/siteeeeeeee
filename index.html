@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -124,7 +124,7 @@
             <div class="slots-info-popup">
                 <div class="aposta-info-popup">
                     <span>Regras:</span>
-                    <span id="regrasDificuldade">Perde R$ 10% | Ganha R$ 300%</span>
+                    <span id="regrasDificuldade">Perde 10% | Ganha 300%</span>
                 </div>
             </div>
             
@@ -202,6 +202,11 @@
 
     <img src="pvz.jpg" id="flying-finaland" alt="">
 
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        window.supabase = supabase;
+    </script>
+
     <script>
         window.mostrarImagem = function(src) {
             const modalImagem = document.getElementById('modalImagem');
@@ -240,6 +245,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const supabase = window.supabase;
+            
             const btnLogout = document.getElementById('btnLogout');
             const btnAdicionar = document.getElementById('btnAdicionar');
             const inputItem = document.getElementById('item');
@@ -287,9 +294,9 @@
             let saldoJogo = 50.00, girando = false, dificuldadeAtual = 'facil';
             let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
-                facil: { perda: 0.1, ganho: 3.0, texto: 'Perde R$ 10% | Ganha R$ 300%' },
-                medio: { perda: 0.3, ganho: 2.0, texto: 'Perde R$ 30% | Ganha R$ 200%' },
-                dificil: { perda: 0.5, ganho: 1.0, texto: 'Perde R$ 50% | Ganha R$ 100%' }
+                facil: { perda: 0.1, ganho: 3.0, texto: 'Perde 10% | Ganha 300%' },
+                medio: { perda: 0.3, ganho: 2.0, texto: 'Perde 30% | Ganha 200%' },
+                dificil: { perda: 0.5, ganho: 1.0, texto: 'Perde 50% | Ganha 100%' }
             };
             
             let inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
@@ -521,6 +528,7 @@
             }
 
             function abrirSeletorImagem(i) { itemAtualParaImagem = i; uploadImagemInput.click(); }
+            
             uploadImagemInput.addEventListener('change', async (e) => {
                 const f = e.target.files[0];
                 if (!f || itemAtualParaImagem === null) return;
@@ -529,12 +537,22 @@
                 try {
                     loadingOverlay.style.display = 'flex';
                     const b64 = await comprimirImagem(f);
-                    if (listaItens[itemAtualParaImagem]) { listaItens[itemAtualParaImagem].imagem = b64; salvarLista(); renderizarLista(); }
+                    if (listaItens[itemAtualParaImagem]) {
+                        listaItens[itemAtualParaImagem].imagem = b64;
+                        await atualizarItemNoBanco(itemAtualParaImagem);
+                        renderizarLista();
+                    }
                 } catch (er) { alert('Erro ao processar.'); }
                 finally { loadingOverlay.style.display = 'none'; uploadImagemInput.value = ''; itemAtualParaImagem = null; }
             });
 
-            function removerImagem(i) { if (listaItens[i]) { delete listaItens[i].imagem; salvarLista(); renderizarLista(); } }
+            async function removerImagem(i) {
+                if (listaItens[i]) {
+                    listaItens[i].imagem = null;
+                    await atualizarItemNoBanco(i);
+                    renderizarLista();
+                }
+            }
 
             function moveFinaland() { if (!easterEggAtivo) return; xPosition += speed * xDirection; yPosition += speed * yDirection; if (xPosition >= innerWidth - 50 || xPosition <= 0) xDirection *= -1; if (yPosition >= innerHeight - 50 || yPosition <= 0) yDirection *= -1; flyingFinaland.style.left = xPosition + 'px'; flyingFinaland.style.top = yPosition + 'px'; }
             setInterval(moveFinaland, 50);
@@ -543,9 +561,140 @@
 
             function atualizarEstadoVazio() { if (listaItens.length === 0) { estadoVazio.style.display = 'flex'; listaElement.style.display = 'none'; btnLimparComprados.style.display = 'none'; } else { estadoVazio.style.display = 'none'; listaElement.style.display = 'block'; btnLimparComprados.style.display = listaItens.some(i => i.comprado) ? 'block' : 'none'; } }
 
-            function salvarLista() { localStorage.setItem('listaCompras', JSON.stringify(listaItens)); avisoVisual.style.opacity = '1'; avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)'; avisoVisual.style.borderLeftColor = '#fff'; avisoVisual.style.color = '#fff'; avisoVisual.querySelector('span').textContent = 'Lista salva!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.'; }, 2000); }
+            function salvarLista() {
+                avisoVisual.style.opacity = '1';
+                avisoVisual.style.backgroundColor = 'rgba(39, 174, 96, 0.9)';
+                avisoVisual.style.borderLeftColor = '#fff';
+                avisoVisual.style.color = '#fff';
+                avisoVisual.querySelector('span').textContent = 'Lista salva!';
+                setTimeout(() => {
+                    avisoVisual.style.opacity = '0.6';
+                    avisoVisual.style.backgroundColor = 'rgba(0,0,0,0.75)';
+                    avisoVisual.querySelector('span').textContent = 'Possível atraso visual. Dados salvos.';
+                }, 2000);
+            }
 
-            function carregarLista() { const s = localStorage.getItem('listaCompras'); listaItens = s ? JSON.parse(s) : []; renderizarLista(); setTimeout(() => { if (listaItens.length && !listaElement.children.length) renderizarLista(); }, 10); }
+            async function getUser() {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) window.location.href = 'login.html';
+                return user;
+            }
+
+            async function carregarLista() {
+                try {
+                    const user = await getUser();
+                    const { data, error } = await supabase
+                        .from('lista_compras')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .order('created_at', { ascending: true });
+                    
+                    if (error) {
+                        console.error('Erro ao carregar lista:', error);
+                        listaItens = [];
+                    } else {
+                        listaItens = data.map(item => ({
+                            id: item.id,
+                            nome: item.item,
+                            quantidade: 1,
+                            comprado: false,
+                            imagem: item.imagem || null
+                        }));
+                    }
+                    
+                    renderizarLista();
+                } catch (e) {
+                    console.error('Erro:', e);
+                    listaItens = [];
+                    renderizarLista();
+                }
+            }
+
+            async function adicionarItem() {
+                const nome = inputItem.value.trim();
+                if (!nome) return;
+                
+                try {
+                    const user = await getUser();
+                    const { data, error } = await supabase
+                        .from('lista_compras')
+                        .insert({
+                            item: nome,
+                            user_id: user.id
+                        })
+                        .select()
+                        .single();
+                    
+                    if (error) {
+                        alert('Erro ao adicionar: ' + error.message);
+                        return;
+                    }
+                    
+                    listaItens.push({
+                        id: data.id,
+                        nome: data.item,
+                        quantidade: 1,
+                        comprado: false,
+                        imagem: data.imagem || null
+                    });
+                    
+                    renderizarLista();
+                    inputItem.value = '';
+                    inputItem.focus();
+                    salvarLista();
+                } catch (e) {
+                    console.error('Erro ao adicionar:', e);
+                }
+            }
+
+            async function atualizarItemNoBanco(index) {
+                try {
+                    const item = listaItens[index];
+                    if (!item || !item.id) return;
+                    
+                    const { error } = await supabase
+                        .from('lista_compras')
+                        .update({
+                            item: item.nome,
+                            imagem: item.imagem || null
+                        })
+                        .eq('id', item.id);
+                    
+                    if (error) console.error('Erro ao atualizar:', error);
+                } catch (e) {
+                    console.error('Erro ao atualizar:', e);
+                }
+            }
+
+            async function removerItemDoBanco(id) {
+                try {
+                    const { error } = await supabase
+                        .from('lista_compras')
+                        .delete()
+                        .eq('id', id);
+                    
+                    if (error) console.error('Erro ao remover:', error);
+                } catch (e) {
+                    console.error('Erro ao remover:', e);
+                }
+            }
+
+            async function limparComprados() {
+                try {
+                    const idsParaRemover = listaItens
+                        .filter(i => i.comprado)
+                        .map(i => i.id);
+                    
+                    for (const id of idsParaRemover) {
+                        await removerItemDoBanco(id);
+                    }
+                    
+                    listaItens = listaItens.filter(i => !i.comprado);
+                    renderizarLista();
+                } catch (e) {
+                    console.error('Erro ao limpar:', e);
+                }
+            }
 
             function renderizarLista() {
                 listaElement.innerHTML = '';
@@ -555,22 +704,71 @@
                     li.innerHTML = `<div class="item-principal"><div class="item-conteudo"><input type="checkbox" class="item-checkbox" ${item.comprado ? 'checked' : ''} data-index="${i}">${item.imagem ? `<div class="item-imagem-container"><img src="${item.imagem}" class="item-imagem-thumb" onclick="mostrarImagem('${item.imagem}')"><button class="btn-remover-imagem" data-index="${i}"><i class="fas fa-times"></i></button></div>` : ''}<span class="item-nome">${item.nome}</span><span class="item-quantidade">${item.quantidade || 1}x</span></div><div class="item-acoes"><button class="btn-icon-small btn-imagem" data-index="${i}"><i class="fas fa-camera"></i></button><button class="btn-icon-small btn-diminuir" data-index="${i}"><i class="fas fa-minus"></i></button><button class="btn-icon-small btn-aumentar" data-index="${i}"><i class="fas fa-plus"></i></button><button class="btn-icon-small btn-remover" data-index="${i}"><i class="fas fa-trash-alt"></i></button></div></div>`;
                     listaElement.appendChild(li);
                 });
-                document.querySelectorAll('.item-checkbox').forEach(cb => cb.addEventListener('change', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].comprado = this.checked; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-diminuir').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i] && listaItens[i].quantidade > 1) { listaItens[i].quantidade--; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-aumentar').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens[i].quantidade = (listaItens[i].quantidade || 1) + 1; salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-remover').forEach(b => b.addEventListener('click', function() { const i = +this.dataset.index; if (listaItens[i]) { listaItens.splice(i, 1); salvarLista(); renderizarLista(); } }));
-                document.querySelectorAll('.btn-imagem').forEach(b => b.addEventListener('click', function() { abrirSeletorImagem(+this.dataset.index); }));
-                document.querySelectorAll('.btn-remover-imagem').forEach(b => b.addEventListener('click', function(e) { e.stopPropagation(); removerImagem(+this.dataset.index); }));
+                
+                document.querySelectorAll('.item-checkbox').forEach(cb => {
+                    cb.addEventListener('change', async function() {
+                        const i = +this.dataset.index;
+                        if (listaItens[i]) {
+                            listaItens[i].comprado = this.checked;
+                            await atualizarItemNoBanco(i);
+                            renderizarLista();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.btn-diminuir').forEach(b => {
+                    b.addEventListener('click', async function() {
+                        const i = +this.dataset.index;
+                        if (listaItens[i] && listaItens[i].quantidade > 1) {
+                            listaItens[i].quantidade--;
+                            await atualizarItemNoBanco(i);
+                            renderizarLista();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.btn-aumentar').forEach(b => {
+                    b.addEventListener('click', async function() {
+                        const i = +this.dataset.index;
+                        if (listaItens[i]) {
+                            listaItens[i].quantidade = (listaItens[i].quantidade || 1) + 1;
+                            await atualizarItemNoBanco(i);
+                            renderizarLista();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.btn-remover').forEach(b => {
+                    b.addEventListener('click', async function() {
+                        const i = +this.dataset.index;
+                        if (listaItens[i]) {
+                            const id = listaItens[i].id;
+                            await removerItemDoBanco(id);
+                            listaItens.splice(i, 1);
+                            renderizarLista();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.btn-imagem').forEach(b => {
+                    b.addEventListener('click', function() { abrirSeletorImagem(+this.dataset.index); });
+                });
+                
+                document.querySelectorAll('.btn-remover-imagem').forEach(b => {
+                    b.addEventListener('click', function(e) { e.stopPropagation(); removerImagem(+this.dataset.index); });
+                });
+                
                 atualizarEstadoVazio();
             }
 
-            function adicionarItem() { const n = inputItem.value.trim(); if (n) { listaItens.push({ nome: n, quantidade: 1, comprado: false }); salvarLista(); renderizarLista(); inputItem.value = ''; inputItem.focus(); } }
-            function limparComprados() { listaItens = listaItens.filter(i => !i.comprado); salvarLista(); renderizarLista(); }
-            function logout() { window.logout ? window.logout() : location.href = 'login.html'; }
+            function logout() {
+                supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
 
             btnAdicionar.addEventListener('click', adicionarItem);
             inputItem.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(); });
-            inputItem.addEventListener('focus', () => { if (listaItens.length && !listaElement.children.length) { renderizarLista(); avisoVisual.style.opacity = '1'; avisoVisual.querySelector('span').textContent = 'Lista restaurada!'; setTimeout(() => { avisoVisual.style.opacity = '0.6'; avisoVisual.querySelector('span').textContent = 'Possível atraso visual.'; }, 2000); } });
+            inputItem.addEventListener('focus', () => { if (listaItens.length && !listaElement.children.length) { renderizarLista(); } });
             btnLimparComprados.addEventListener('click', limparComprados);
             btnLogout.addEventListener('click', logout);
             window.addEventListener('online', () => { modoOffline = false; statusConexao.className = 'status-indicator online'; statusConexao.title = 'Online'; loadingOverlay.style.display = 'none'; });
@@ -581,7 +779,7 @@
 
             function ativarEasterEgg() { if (easterEggAtivo) return; easterEggAtivo = true; const bg = document.createElement('div'); bg.id = 'easter-egg-bg'; bg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background-image:url(blackman.jpg);background-position:center;background-repeat:no-repeat;background-size:contain;opacity:0;pointer-events:none;z-index:9998;transition:opacity 2s,transform 0.3s;'; document.body.appendChild(bg); setTimeout(() => { bg.style.opacity = '0.1'; flyingFinaland.style.opacity = '1'; }, 50); jumpscareTimeout = setTimeout(() => { bg.style.transition = 'opacity 0.1s, transform 0.2s'; bg.style.opacity = '1'; bg.style.transform = 'scale(1.3)'; shakeScreen(); setTimeout(() => { bg.style.transition = 'opacity 1s, transform 0.3s'; bg.style.opacity = '0.1'; bg.style.transform = 'scale(1)'; }, 300); }, 3000); const spd = speed; speed = 18; easterEggTimeout = setTimeout(() => { bg.style.opacity = '0'; speed = spd; flyingFinaland.style.opacity = '0'; setTimeout(() => { bg.remove(); easterEggAtivo = false; }, 2000); }, 15000); }
 
-            carregarLista();
+            getUser().then(() => carregarLista());
             atualizarDisplaySaldo();
             atualizarInventario();
         });
