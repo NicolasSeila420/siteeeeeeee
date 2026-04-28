@@ -140,10 +140,17 @@
                 Gire as roletas!
             </div>
             
-            <button id="btnGirarPopup" class="btn-girar-popup">
-                <i class="fas fa-sync-alt"></i>
-                GIRAR
-            </button>
+            <div class="slots-botoes-container">
+                <button id="btnGirarPopup" class="btn-girar-popup">
+                    <i class="fas fa-sync-alt"></i>
+                    GIRAR
+                </button>
+                
+                <button id="btnAutoPopup" class="btn-auto-popup">
+                    <i class="fas fa-robot"></i>
+                    AUTO
+                </button>
+            </div>
             
             <button id="btnResetarJogoPopup" class="btn-resetar-popup">
                 <i class="fas fa-undo-alt"></i>
@@ -282,6 +289,7 @@
             const popupSaldoJogo = document.getElementById('popupSaldoJogo');
             const slotsMensagemPopup = document.getElementById('slotsMensagemPopup');
             const btnGirarPopup = document.getElementById('btnGirarPopup');
+            const btnAutoPopup = document.getElementById('btnAutoPopup');
             const btnResetarJogoPopup = document.getElementById('btnResetarJogoPopup');
             const regrasSpan = document.getElementById('regrasDificuldade');
             const botoesDificuldade = document.querySelectorAll('.btn-dificuldade');
@@ -300,7 +308,8 @@
             let listaItens = [], modoOffline = false, itemAtualParaImagem = null, zoomAtual = 1;
             
             let saldoJogo = 50.00, girando = false, dificuldadeAtual = 'facil';
-            let simbolos = ['🍒', '💎', '🍊', '7️⃣'];
+            let modoAuto = false, autoIntervalo = null;
+            let simbolos = ['🍒', '💎', '7️⃣'];
             const regrasDificuldade = {
                 facil: { perda: 0.1, ganho: 3.0, texto: 'Perde 10% | Ganha 300%' },
                 medio: { perda: 0.3, ganho: 2.0, texto: 'Perde 30% | Ganha 200%' },
@@ -428,6 +437,7 @@
             }
 
             function abrirPopupLoja() {
+                pararModoAuto();
                 popupSlots.style.display = 'none';
                 popupLoja.style.display = 'block';
                 popupLoja.style.transform = 'translate(-50%, -50%)';
@@ -443,19 +453,54 @@
                 });
             }
 
-            async function girarRoletas() {
-                if (girando || saldoJogo <= 0) {
-                    if (saldoJogo <= 0) {
-                        slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.';
-                        slotsMensagemPopup.style.color = 'var(--cor-erro)';
-                    }
-                    return;
+            function pararModoAuto() {
+                if (autoIntervalo) {
+                    clearInterval(autoIntervalo);
+                    autoIntervalo = null;
                 }
+                modoAuto = false;
+                btnAutoPopup.innerHTML = '<i class="fas fa-robot"></i> AUTO';
+                btnAutoPopup.classList.remove('auto-ativo');
+                btnGirarPopup.disabled = false;
+                girando = false;
+            }
+
+            function alternarModoAuto() {
+                if (modoAuto) {
+                    pararModoAuto();
+                    slotsMensagemPopup.textContent = '🛑 Modo AUTO desativado.';
+                    slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
+                } else {
+                    if (saldoJogo <= 0) {
+                        slotsMensagemPopup.textContent = '💰 Sem dinheiro para o modo AUTO!';
+                        slotsMensagemPopup.style.color = 'var(--cor-erro)';
+                        return;
+                    }
+                    modoAuto = true;
+                    btnAutoPopup.innerHTML = '<i class="fas fa-stop"></i> PARAR';
+                    btnAutoPopup.classList.add('auto-ativo');
+                    btnGirarPopup.disabled = true;
+                    slotsMensagemPopup.textContent = '🤖 Modo AUTO ativado! Rodando...';
+                    slotsMensagemPopup.style.color = '#f39c12';
+                    
+                    autoIntervalo = setInterval(() => {
+                        if (!modoAuto || saldoJogo <= 0) {
+                            pararModoAuto();
+                            if (saldoJogo <= 0) {
+                                slotsMensagemPopup.textContent = '💰 Quebrado! Modo AUTO parou.';
+                                slotsMensagemPopup.style.color = 'var(--cor-erro)';
+                            }
+                            return;
+                        }
+                        girarRoletasSilencioso();
+                    }, 1200);
+                }
+            }
+
+            async function girarRoletasSilencioso() {
+                if (saldoJogo <= 0) return;
                 
                 girando = true;
-                btnGirarPopup.disabled = true;
-                slotsMensagemPopup.textContent = '🎲 Girando...';
-                slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
                 
                 const [r1, r2, r3] = await Promise.all([
                     girarSlot(slot1),
@@ -474,7 +519,7 @@
                     
                     if (r1 === '🍇' && inventario.uva > 0) {
                         mult = 4.0;
-                        slotsMensagemPopup.textContent = '🍇 UVA! 400%!';
+                        slotsMensagemPopup.textContent = '🤖🍇 UVA! 400%!';
                     }
                     
                     if (inventario.pimenta > 0) {
@@ -483,7 +528,7 @@
                         }
                         if (inventario.pimentaAtiva) {
                             mult = 7.0;
-                            slotsMensagemPopup.textContent = '🌶️ PIMENTA! 700%!';
+                            slotsMensagemPopup.textContent = '🤖🌶️ PIMENTA! 700%!';
                             inventario.pimentaAtiva = false;
                             inventario.vitoriasConsecutivas = 0;
                         }
@@ -493,13 +538,11 @@
                     saldoJogo += ganho;
                     
                     if (mult === 1) {
-                        slotsMensagemPopup.textContent = `🎉 VENCEU! +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
-                    } else {
-                        slotsMensagemPopup.textContent += ` +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
+                        slotsMensagemPopup.textContent = `🤖🎉 +R$ ${ganho.toFixed(2).replace('.', ',')}!`;
                     }
                     slotsMensagemPopup.style.color = 'var(--cor-sucesso)';
                 } else if (doisIguais) {
-                    slotsMensagemPopup.textContent = '🤝 Empate! Não ganhou nem perdeu.';
+                    slotsMensagemPopup.textContent = '🤖🤝 Empate!';
                     slotsMensagemPopup.style.color = '#f39c12';
                 } else {
                     inventario.vitoriasConsecutivas = 0;
@@ -507,26 +550,45 @@
                     
                     const perda = saldoJogo * regra.perda;
                     saldoJogo -= perda;
-                    slotsMensagemPopup.textContent = `😂 Perdeu R$ ${perda.toFixed(2).replace('.', ',')}`;
+                    slotsMensagemPopup.textContent = `🤖😂 -R$ ${perda.toFixed(2).replace('.', ',')}`;
                     slotsMensagemPopup.style.color = 'var(--cor-erro)';
                 }
                 
                 if (saldoJogo < 0.01) {
                     saldoJogo = 0;
-                    slotsMensagemPopup.textContent = '🫵😂 PERDEU TUDO! Recomeça.';
+                    slotsMensagemPopup.textContent = '🤖💔 PERDEU TUDO! Modo AUTO parou.';
+                    slotsMensagemPopup.style.color = 'var(--cor-erro)';
+                    pararModoAuto();
                 }
                 
                 atualizarDisplaySaldo();
                 girando = false;
-                btnGirarPopup.disabled = false;
+            }
+
+            async function girarRoletas() {
+                if (modoAuto) {
+                    pararModoAuto();
+                    return;
+                }
+                
+                if (girando || saldoJogo <= 0) {
+                    if (saldoJogo <= 0) {
+                        slotsMensagemPopup.textContent = '💰 Quebrado! Recomece.';
+                        slotsMensagemPopup.style.color = 'var(--cor-erro)';
+                    }
+                    return;
+                }
+                
+                await girarRoletasSilencioso();
             }
 
             function resetarJogo() {
+                pararModoAuto();
                 saldoJogo = 50.00;
                 slot1.textContent = slot2.textContent = slot3.textContent = '🍒';
                 slotsMensagemPopup.textContent = '✨ Boa sorte! ✨'; slotsMensagemPopup.style.color = 'var(--cor-primaria-1)';
                 inventario = { uva: 0, pimenta: 0, vitoriasConsecutivas: 0, pimentaAtiva: false };
-                simbolos = ['🍒', '💎', '🍊', '7️⃣'];
+                simbolos = ['🍒', '💎', '7️⃣'];
                 atualizarDisplaySaldo(); atualizarInventario();
                 girando = false; btnGirarPopup.disabled = false;
                 
@@ -547,8 +609,9 @@
             }
 
             btnJogoSlots.addEventListener('click', abrirPopupSlots);
-            popupFecharSlots.addEventListener('click', () => popupSlots.style.display = 'none');
+            popupFecharSlots.addEventListener('click', () => { pararModoAuto(); popupSlots.style.display = 'none'; });
             btnGirarPopup.addEventListener('click', girarRoletas);
+            btnAutoPopup.addEventListener('click', alternarModoAuto);
             btnResetarJogoPopup.addEventListener('click', resetarJogo);
             btnLoja.addEventListener('click', abrirPopupLoja);
             popupFecharLoja.addEventListener('click', () => popupLoja.style.display = 'none');
@@ -838,6 +901,7 @@
             }
 
             function logout() {
+                pararModoAuto();
                 supabase.auth.signOut();
                 window.location.href = 'login.html';
             }
