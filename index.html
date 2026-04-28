@@ -230,7 +230,6 @@
         </div>
         <div class="duck-hunt-area" id="duckHuntArea">
             <div class="duck-hunt-ceu"></div>
-            <div id="duckHuntFlash" class="duck-hunt-flash"></div>
             <div class="duck-hunt-mensagem" id="duckHuntMensagem">
                 Atire nos patos! 🎯
             </div>
@@ -238,6 +237,12 @@
         </div>
         <div class="duck-hunt-arma-container">
             <img src="ak47.png" alt="AK-47" class="duck-hunt-arma" id="duckHuntArma">
+        </div>
+        <div class="duck-hunt-modo-indicador" id="duckHuntModoIndicador">
+            <span id="duckHuntModoTexto">🔫 SEMI | Q para trocar</span>
+            <div class="superaquecimento-barra" id="superaquecimentoBarra">
+                <div class="superaquecimento-preenchimento" id="superaquecimentoPreenchimento"></div>
+            </div>
         </div>
         <button id="btnIniciarDuckHunt" class="duck-hunt-iniciar">
             <i class="fas fa-play"></i>
@@ -323,7 +328,9 @@
             const duckHuntFalhas = document.getElementById('duckHuntFalhas');
             const duckHuntRound = document.getElementById('duckHuntRound');
             const duckHuntMensagem = document.getElementById('duckHuntMensagem');
-            const duckHuntFlash = document.getElementById('duckHuntFlash');
+            const duckHuntModoIndicador = document.getElementById('duckHuntModoIndicador');
+            const duckHuntModoTexto = document.getElementById('duckHuntModoTexto');
+            const superaquecimentoPreenchimento = document.getElementById('superaquecimentoPreenchimento');
             
             const popupSlots = document.getElementById('popupSlots');
             const popupFecharSlots = document.getElementById('popupFecharSlots');
@@ -370,8 +377,12 @@
             let patosAbatidos = 0;
             let patosFalhas = 0;
             let duckHuntRoundNum = 1;
-            let velocidadeBase = 2000;
             let patoIdCounter = 0;
+            let modoAutomatico = false;
+            let mousePressionado = false;
+            let superaquecimento = 0;
+            let armaTravada = false;
+            let ultimoTiro = 0;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -610,6 +621,10 @@
                 telaDuckHunt.style.userSelect = 'none';
                 telaDuckHunt.style.webkitUserSelect = 'none';
                 telaDuckHunt.style.msUserSelect = 'none';
+                duckHuntModoIndicador.style.opacity = '0';
+                superaquecimento = 0;
+                armaTravada = false;
+                atualizarBarraSuperaquecimento();
             }
 
             function fecharDuckHunt() {
@@ -619,9 +634,80 @@
 
             function pararDuckHunt() {
                 duckHuntAtivo = false;
+                mousePressionado = false;
                 if (duckHuntIntervalo) { clearInterval(duckHuntIntervalo); duckHuntIntervalo = null; }
                 patosNaTela.forEach(p => p.elemento.remove());
                 patosNaTela = [];
+            }
+
+            function atualizarBarraSuperaquecimento() {
+                superaquecimentoPreenchimento.style.width = superaquecimento + '%';
+                if (superaquecimento >= 80) {
+                    superaquecimentoPreenchimento.style.background = 'linear-gradient(90deg, #f39c12, #e74c3c)';
+                } else if (superaquecimento >= 50) {
+                    superaquecimentoPreenchimento.style.background = 'linear-gradient(90deg, #f39c12, #f1c40f)';
+                } else {
+                    superaquecimentoPreenchimento.style.background = 'linear-gradient(90deg, #2ecc71, #f39c12)';
+                }
+            }
+
+            function atirarEfeito() {
+                if (modoAutomatico) {
+                    const tremorX = (Math.random() - 0.5) * 12;
+                    const tremorY = 6 + Math.random() * 8;
+                    duckHuntArma.style.transform = `translate(${tremorX}px, ${tremorY}px)`;
+                } else {
+                    duckHuntArma.style.transform = 'translateY(6px)';
+                }
+                duckHuntArma.style.transition = 'transform 0.05s';
+                
+                setTimeout(() => {
+                    duckHuntArma.style.transform = 'translate(0px, 0px)';
+                    duckHuntArma.style.transition = 'transform 0.12s ease-out';
+                }, 50);
+            }
+
+            function atirar() {
+                if (!duckHuntAtivo || armaTravada) return;
+                
+                const agora = Date.now();
+                if (agora - ultimoTiro < 80) return;
+                ultimoTiro = agora;
+                
+                atirarEfeito();
+                
+                if (modoAutomatico) {
+                    superaquecimento = Math.min(100, superaquecimento + 3);
+                    atualizarBarraSuperaquecimento();
+                    
+                    if (superaquecimento >= 100) {
+                        armaTravada = true;
+                        duckHuntMensagem.textContent = '🔥 Superaquecida! Aguarde...';
+                        duckHuntMensagem.className = 'duck-hunt-mensagem erro';
+                        
+                        const resfriar = setInterval(() => {
+                            superaquecimento = Math.max(0, superaquecimento - 5);
+                            atualizarBarraSuperaquecimento();
+                            if (superaquecimento <= 0) {
+                                clearInterval(resfriar);
+                                armaTravada = false;
+                                if (duckHuntAtivo) {
+                                    duckHuntMensagem.textContent = 'Atire nos patos! 🎯';
+                                    duckHuntMensagem.className = 'duck-hunt-mensagem';
+                                }
+                            }
+                        }, 100);
+                    }
+                }
+            }
+
+            function trocarModoTiro() {
+                if (!duckHuntAtivo) return;
+                modoAutomatico = !modoAutomatico;
+                duckHuntModoTexto.textContent = modoAutomatico ? '🔥 AUTO | Q para trocar' : '🔫 SEMI | Q para trocar';
+                superaquecimento = 0;
+                armaTravada = false;
+                atualizarBarraSuperaquecimento();
             }
 
             function criarPato() {
@@ -648,6 +734,11 @@
                 pato.style.top = y + 'px';
                 pato.style.left = direita ? '-110px' : (duckHuntArea.clientWidth + 10) + 'px';
                 
+                const ehVermelho = duckHuntRoundNum >= 5 && Math.random() < 0.3;
+                if (ehVermelho) {
+                    pato.style.filter = 'hue-rotate(0deg) saturate(2) brightness(0.7) sepia(1) hue-rotate(-20deg) saturate(8)';
+                }
+                
                 const patoObj = {
                     id: patoIdCounter++,
                     elemento: pato,
@@ -655,6 +746,7 @@
                     x: direita ? -110 : duckHuntArea.clientWidth + 10,
                     y: y,
                     vivo: true,
+                    vermelho: ehVermelho,
                     velocidade: 2 + (duckHuntRoundNum - 1) * 1.5
                 };
                 
@@ -667,6 +759,11 @@
                     nuvem.className = 'nuvem-explosao';
                     nuvem.style.left = (patoObj.x + 50) + 'px';
                     nuvem.style.top = (patoObj.y + 50) + 'px';
+                    if (patoObj.vermelho) {
+                        nuvem.style.background = 'radial-gradient(circle, rgba(255, 50, 0, 1) 0%, rgba(255, 150, 0, 0.8) 30%, rgba(255, 255, 0, 0.4) 60%, transparent 100%)';
+                        nuvem.style.width = '160px';
+                        nuvem.style.height = '160px';
+                    }
                     duckHuntArea.appendChild(nuvem);
                     
                     pato.style.opacity = '0';
@@ -676,10 +773,37 @@
                     patosAbatidos++;
                     duckHuntPlacar.textContent = patosAbatidos;
                     
+                    if (patoObj.vermelho) {
+                        patosNaTela.forEach(outroPato => {
+                            if (outroPato.id !== patoObj.id && outroPato.vivo) {
+                                const dist = Math.hypot(outroPato.x - patoObj.x, outroPato.y - patoObj.y);
+                                if (dist < 150) {
+                                    outroPato.vivo = false;
+                                    outroPato.elemento.style.opacity = '0';
+                                    outroPato.elemento.style.transform = 'scale(0)';
+                                    outroPato.elemento.style.transition = 'all 0.2s';
+                                    patosAbatidos++;
+                                    duckHuntPlacar.textContent = patosAbatidos;
+                                    
+                                    const miniNuvem = document.createElement('div');
+                                    miniNuvem.className = 'nuvem-explosao';
+                                    miniNuvem.style.left = (outroPato.x + 50) + 'px';
+                                    miniNuvem.style.top = (outroPato.y + 50) + 'px';
+                                    duckHuntArea.appendChild(miniNuvem);
+                                    
+                                    setTimeout(() => {
+                                        outroPato.elemento.remove();
+                                        miniNuvem.remove();
+                                    }, 500);
+                                }
+                            }
+                        });
+                    }
+                    
                     if (patosAbatidos >= duckHuntRoundNum * 3) {
                         duckHuntRoundNum++;
                         duckHuntRound.textContent = duckHuntRoundNum;
-                        duckHuntMensagem.textContent = `Round ${duckHuntRoundNum}! Mais rápido! 🦆`;
+                        duckHuntMensagem.textContent = `Round ${duckHuntRoundNum}! ${duckHuntRoundNum >= 5 ? '🔥 Patos vermelhos!' : 'Mais rápido! 🦆'}`;
                         duckHuntMensagem.className = 'duck-hunt-mensagem sucesso';
                     }
                     
@@ -741,22 +865,6 @@
                 requestAnimationFrame(mover);
             }
 
-            function atirarEfeito() {
-                duckHuntArma.style.transform = 'translateY(8px)';
-                duckHuntArma.style.transition = 'transform 0.05s';
-                
-                duckHuntFlash.classList.add('flash-ativo');
-                
-                setTimeout(() => {
-                    duckHuntArma.style.transform = 'translateY(0px)';
-                    duckHuntArma.style.transition = 'transform 0.15s ease-out';
-                }, 50);
-                
-                setTimeout(() => {
-                    duckHuntFlash.classList.remove('flash-ativo');
-                }, 80);
-            }
-
             function iniciarDuckHunt() {
                 pararDuckHunt();
                 patosAbatidos = 0;
@@ -771,6 +879,12 @@
                 btnIniciarDuckHunt.style.display = 'none';
                 btnIniciarDuckHunt.textContent = 'INICIAR DUCK HUNT';
                 btnIniciarDuckHunt.innerHTML = '<i class="fas fa-play"></i> INICIAR DUCK HUNT';
+                duckHuntModoIndicador.style.opacity = '1';
+                modoAutomatico = false;
+                duckHuntModoTexto.textContent = '🔫 SEMI | Q para trocar';
+                superaquecimento = 0;
+                armaTravada = false;
+                atualizarBarraSuperaquecimento();
                 
                 telaDuckHunt.style.userSelect = 'none';
                 telaDuckHunt.style.webkitUserSelect = 'none';
@@ -806,9 +920,31 @@
                 duckHuntCrosshair.style.opacity = '0';
             });
             
-            duckHuntArea.addEventListener('click', function(e) {
+            duckHuntArea.addEventListener('mousedown', function(e) {
                 if (!duckHuntAtivo) return;
-                atirarEfeito();
+                mousePressionado = true;
+                atirar();
+                
+                if (modoAutomatico) {
+                    const intervaloAutomatico = setInterval(() => {
+                        if (!mousePressionado || !duckHuntAtivo || armaTravada) {
+                            clearInterval(intervaloAutomatico);
+                            return;
+                        }
+                        atirar();
+                    }, 100);
+                    
+                    const originalMouseUp = () => {
+                        mousePressionado = false;
+                        clearInterval(intervaloAutomatico);
+                        document.removeEventListener('mouseup', originalMouseUp);
+                    };
+                    document.addEventListener('mouseup', originalMouseUp);
+                }
+            });
+            
+            duckHuntArea.addEventListener('mouseup', function(e) {
+                mousePressionado = false;
             });
 
             duckHuntArea.addEventListener('selectstart', function(e) {
@@ -817,6 +953,13 @@
             
             duckHuntArea.addEventListener('dragstart', function(e) {
                 e.preventDefault();
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (!duckHuntAtivo) return;
+                if (e.key === 'q' || e.key === 'Q') {
+                    trocarModoTiro();
+                }
             });
 
             btnDuckHunt.addEventListener('click', abrirDuckHunt);
