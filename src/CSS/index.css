@@ -1536,3 +1536,44 @@ body {
         font-size: 1.1rem;
     }
 }
+.duck-hunt-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 0, 0.3);
+    pointer-events: none;
+    z-index: 35;
+    opacity: 0;
+    transition: opacity 0.05s;
+}
+
+.duck-hunt-flash.flash-ativo {
+    opacity: 1;
+}
+
+.nuvem-explosao {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.8) 0%, rgba(255, 100, 0, 0.6) 30%, rgba(255, 200, 0, 0.3) 60%, transparent 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    animation: nuvemExpandir 0.5s ease-out forwards;
+}
+
+@keyframes nuvemExpandir {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+    }
+    100% {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+    }
+}
