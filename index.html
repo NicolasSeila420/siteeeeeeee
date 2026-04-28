@@ -383,6 +383,7 @@
             let superaquecimento = 0;
             let armaTravada = false;
             let ultimoTiro = 0;
+            let automaticoIntervalo = null;
 
             flyingFinaland.style.opacity = '0';
             flyingFinaland.style.transition = 'opacity 0.5s';
@@ -635,6 +636,7 @@
             function pararDuckHunt() {
                 duckHuntAtivo = false;
                 mousePressionado = false;
+                if (automaticoIntervalo) { clearInterval(automaticoIntervalo); automaticoIntervalo = null; }
                 if (duckHuntIntervalo) { clearInterval(duckHuntIntervalo); duckHuntIntervalo = null; }
                 patosNaTela.forEach(p => p.elemento.remove());
                 patosNaTela = [];
@@ -667,7 +669,104 @@
                 }, 50);
             }
 
-            function atirar() {
+            function acertarPato(patoObj) {
+                if (!patoObj || !patoObj.vivo) return;
+                patoObj.vivo = false;
+                
+                const nuvem = document.createElement('div');
+                nuvem.className = 'nuvem-explosao';
+                nuvem.style.left = (patoObj.x + 50) + 'px';
+                nuvem.style.top = (patoObj.y + 50) + 'px';
+                if (patoObj.vermelho) {
+                    nuvem.style.background = 'radial-gradient(circle, rgba(255, 50, 0, 1) 0%, rgba(255, 150, 0, 0.8) 30%, rgba(255, 255, 0, 0.4) 60%, transparent 100%)';
+                    nuvem.style.width = '160px';
+                    nuvem.style.height = '160px';
+                }
+                duckHuntArea.appendChild(nuvem);
+                
+                patoObj.elemento.style.opacity = '0';
+                patoObj.elemento.style.transform = 'scale(0)';
+                patoObj.elemento.style.transition = 'all 0.2s';
+                
+                patosAbatidos++;
+                duckHuntPlacar.textContent = patosAbatidos;
+                
+                if (patoObj.vermelho) {
+                    setTimeout(() => {
+                        patosNaTela.forEach(outroPato => {
+                            if (outroPato.id !== patoObj.id && outroPato.vivo) {
+                                const dist = Math.hypot(outroPato.x - patoObj.x, outroPato.y - patoObj.y);
+                                if (dist < 150) {
+                                    acertarPatoSilencioso(outroPato);
+                                }
+                            }
+                        });
+                    }, 50);
+                }
+                
+                if (patosAbatidos >= duckHuntRoundNum * 3) {
+                    duckHuntRoundNum++;
+                    duckHuntRound.textContent = duckHuntRoundNum;
+                    duckHuntMensagem.textContent = `Round ${duckHuntRoundNum}! ${duckHuntRoundNum >= 5 ? '🔥 Patos vermelhos!' : 'Mais rápido! 🦆'}`;
+                    duckHuntMensagem.className = 'duck-hunt-mensagem sucesso';
+                }
+                
+                setTimeout(() => {
+                    patoObj.elemento.remove();
+                    nuvem.remove();
+                }, 500);
+            }
+
+            function acertarPatoSilencioso(patoObj) {
+                if (!patoObj || !patoObj.vivo) return;
+                patoObj.vivo = false;
+                
+                const miniNuvem = document.createElement('div');
+                miniNuvem.className = 'nuvem-explosao';
+                miniNuvem.style.left = (patoObj.x + 50) + 'px';
+                miniNuvem.style.top = (patoObj.y + 50) + 'px';
+                duckHuntArea.appendChild(miniNuvem);
+                
+                patoObj.elemento.style.opacity = '0';
+                patoObj.elemento.style.transform = 'scale(0)';
+                patoObj.elemento.style.transition = 'all 0.2s';
+                
+                patosAbatidos++;
+                duckHuntPlacar.textContent = patosAbatidos;
+                
+                setTimeout(() => {
+                    patoObj.elemento.remove();
+                    miniNuvem.remove();
+                }, 500);
+            }
+
+            function verificarAcerto(clientX, clientY) {
+                if (!duckHuntAtivo || armaTravada) return false;
+                
+                const rect = duckHuntArea.getBoundingClientRect();
+                const mouseX = clientX - rect.left;
+                const mouseY = clientY - rect.top;
+                
+                let acertou = false;
+                
+                for (const patoObj of patosNaTela) {
+                    if (!patoObj.vivo) continue;
+                    
+                    const patoCenterX = patoObj.x + 50;
+                    const patoCenterY = patoObj.y + 50;
+                    const dist = Math.hypot(mouseX - patoCenterX, mouseY - patoCenterY);
+                    
+                    if (dist < 60) {
+                        acertarPato(patoObj);
+                        acertou = true;
+                        break;
+                    }
+                }
+                
+                return acertou;
+            }
+
+            function processarTiro(clientX, clientY) {
                 if (!duckHuntAtivo || armaTravada) return;
                 
                 const agora = Date.now();
@@ -675,6 +774,7 @@
                 ultimoTiro = agora;
                 
                 atirarEfeito();
+                verificarAcerto(clientX, clientY);
                 
                 if (modoAutomatico) {
                     superaquecimento = Math.min(100, superaquecimento + 3);
@@ -708,6 +808,7 @@
                 superaquecimento = 0;
                 armaTravada = false;
                 atualizarBarraSuperaquecimento();
+                if (automaticoIntervalo) { clearInterval(automaticoIntervalo); automaticoIntervalo = null; }
             }
 
             function criarPato() {
@@ -725,6 +826,7 @@
                 pato.style.zIndex = '10';
                 pato.style.userSelect = 'none';
                 pato.style.webkitUserSelect = 'none';
+                pato.style.pointerEvents = 'none';
                 
                 const direita = Math.random() > 0.5;
                 const yMin = 40;
@@ -749,69 +851,6 @@
                     vermelho: ehVermelho,
                     velocidade: 2 + (duckHuntRoundNum - 1) * 1.5
                 };
-                
-                pato.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    if (!patoObj.vivo) return;
-                    patoObj.vivo = false;
-                    
-                    const nuvem = document.createElement('div');
-                    nuvem.className = 'nuvem-explosao';
-                    nuvem.style.left = (patoObj.x + 50) + 'px';
-                    nuvem.style.top = (patoObj.y + 50) + 'px';
-                    if (patoObj.vermelho) {
-                        nuvem.style.background = 'radial-gradient(circle, rgba(255, 50, 0, 1) 0%, rgba(255, 150, 0, 0.8) 30%, rgba(255, 255, 0, 0.4) 60%, transparent 100%)';
-                        nuvem.style.width = '160px';
-                        nuvem.style.height = '160px';
-                    }
-                    duckHuntArea.appendChild(nuvem);
-                    
-                    pato.style.opacity = '0';
-                    pato.style.transform = 'scale(0)';
-                    pato.style.transition = 'all 0.2s';
-                    
-                    patosAbatidos++;
-                    duckHuntPlacar.textContent = patosAbatidos;
-                    
-                    if (patoObj.vermelho) {
-                        patosNaTela.forEach(outroPato => {
-                            if (outroPato.id !== patoObj.id && outroPato.vivo) {
-                                const dist = Math.hypot(outroPato.x - patoObj.x, outroPato.y - patoObj.y);
-                                if (dist < 150) {
-                                    outroPato.vivo = false;
-                                    outroPato.elemento.style.opacity = '0';
-                                    outroPato.elemento.style.transform = 'scale(0)';
-                                    outroPato.elemento.style.transition = 'all 0.2s';
-                                    patosAbatidos++;
-                                    duckHuntPlacar.textContent = patosAbatidos;
-                                    
-                                    const miniNuvem = document.createElement('div');
-                                    miniNuvem.className = 'nuvem-explosao';
-                                    miniNuvem.style.left = (outroPato.x + 50) + 'px';
-                                    miniNuvem.style.top = (outroPato.y + 50) + 'px';
-                                    duckHuntArea.appendChild(miniNuvem);
-                                    
-                                    setTimeout(() => {
-                                        outroPato.elemento.remove();
-                                        miniNuvem.remove();
-                                    }, 500);
-                                }
-                            }
-                        });
-                    }
-                    
-                    if (patosAbatidos >= duckHuntRoundNum * 3) {
-                        duckHuntRoundNum++;
-                        duckHuntRound.textContent = duckHuntRoundNum;
-                        duckHuntMensagem.textContent = `Round ${duckHuntRoundNum}! ${duckHuntRoundNum >= 5 ? '🔥 Patos vermelhos!' : 'Mais rápido! 🦆'}`;
-                        duckHuntMensagem.className = 'duck-hunt-mensagem sucesso';
-                    }
-                    
-                    setTimeout(() => {
-                        pato.remove();
-                        nuvem.remove();
-                    }, 500);
-                });
                 
                 duckHuntArea.appendChild(pato);
                 patosNaTela.push(patoObj);
@@ -914,6 +953,10 @@
                 duckHuntCrosshair.style.opacity = '1';
                 
                 duckHuntArma.style.left = Math.max(0, Math.min(window.innerWidth - 300, e.clientX - 150)) + 'px';
+                
+                if (modoAutomatico && mousePressionado && duckHuntAtivo && !armaTravada) {
+                    processarTiro(e.clientX, e.clientY);
+                }
             });
             
             duckHuntArea.addEventListener('mouseleave', function() {
@@ -922,29 +965,20 @@
             
             duckHuntArea.addEventListener('mousedown', function(e) {
                 if (!duckHuntAtivo) return;
+                e.preventDefault();
                 mousePressionado = true;
-                atirar();
-                
-                if (modoAutomatico) {
-                    const intervaloAutomatico = setInterval(() => {
-                        if (!mousePressionado || !duckHuntAtivo || armaTravada) {
-                            clearInterval(intervaloAutomatico);
-                            return;
-                        }
-                        atirar();
-                    }, 100);
-                    
-                    const originalMouseUp = () => {
-                        mousePressionado = false;
-                        clearInterval(intervaloAutomatico);
-                        document.removeEventListener('mouseup', originalMouseUp);
-                    };
-                    document.addEventListener('mouseup', originalMouseUp);
-                }
+                processarTiro(e.clientX, e.clientY);
             });
             
             duckHuntArea.addEventListener('mouseup', function(e) {
                 mousePressionado = false;
+            });
+
+            duckHuntArea.addEventListener('click', function(e) {
+                if (!duckHuntAtivo) return;
+                if (!modoAutomatico) {
+                    processarTiro(e.clientX, e.clientY);
+                }
             });
 
             duckHuntArea.addEventListener('selectstart', function(e) {
@@ -953,6 +987,12 @@
             
             duckHuntArea.addEventListener('dragstart', function(e) {
                 e.preventDefault();
+            });
+            
+            document.addEventListener('mouseup', function(e) {
+                if (mousePressionado) {
+                    mousePressionado = false;
+                }
             });
             
             document.addEventListener('keydown', function(e) {
